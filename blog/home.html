@@ -1,0 +1,248 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Wen are in the darkness</title>
+
+
+<style type="text/css">
+<!--
+* { margin:0; padding:0; }
+#Image1 {
+	background-color: #000000;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	margin: 0px;
+	margin-left: 0px;
+}
+#Layer1 {
+	position:absolute;
+	width:200px;
+	height:115px;
+	z-index:1;
+	left: 892px;
+	top: 476px;
+}
+#fbtn{ 
+display:none; 
+overflow:hidden; 
+border-style:solid; 
+border-width:1px; 
+border-color:#00ff00; 
+padding:1 1 1 1; 
+width:115px; 
+height:30px; 
+} 
+#fbtn_txt{ 
+position:relative; 
+} 
+#fbtn_txt div{ 
+height:30px; 
+padding-top:11px; 
+font-size:15px; 
+color:red;
+font-style:inherit;
+font-weight:bold;
+font-family:Arial, Helvetica, sans-serif;
+text-align:center; 
+cursor:hand; 
+} 
+#fbtn_mask{ 
+background-color:black; 
+position:relative; 
+width:100%; 
+height:100%; 
+} 
+#hello {
+	position:absolute;
+	width:241px;
+	height:245px;
+	z-index:2;
+	left: 5%;
+	top: 18%;
+}
+#lower {
+	position:absolute;
+	width:100%;
+	height:32px;
+	z-index:3;
+	top: 95%;
+}
+.STYLE1 {
+	color: #FF0000;
+	font-size: 18px;
+	font-weight: bold;
+}
+a:link {
+	text-decoration: none;
+	color: #FFFF00;
+}
+a:visited {
+	text-decoration: none;
+	color: #FF0000;
+}
+a:hover {
+	text-decoration: none;
+	color: #FFFFFF;
+}
+a:active {
+	text-decoration: none;
+	color: #00FF00;
+}
+.STYLE3 {color: #FFFF00}
+-->
+</style>
+</head>
+
+<body>
+<div id="hello">
+<div id=fbtn> 
+<div id=fbtn_mask></div> 
+<div id=fbtn_txt> 
+<div>Home Page</div> 
+<div><a href="#">网站主页</a></div> 
+</div> 
+</div> 
+
+<div id=fbtn> 
+<div id=fbtn_mask></div> 
+<div id=fbtn_txt> 
+<div>Security</div> 
+<div><a href="artical.html">安全检测</a></div> 
+</div> 
+</div> 
+<div id=fbtn> 
+<div id=fbtn_mask></div> 
+<div id=fbtn_txt> 
+<div>Photos</div> 
+<div><a href="photos.html">宣传图片</a></div> 
+</div> 
+</div> 
+<div id=fbtn> 
+<div id=fbtn_mask></div> 
+<div id=fbtn_txt> 
+<div>Connections</div> 
+<div><a href="connection.html">联系我们</a></div> 
+</div> 
+</div> 
+
+
+
+<script> 
+var current=null; 
+var t=null; 
+for(var i=0;i<fbtn.length;i++){ 
+fbtn_txt[i].style.posTop=-30; 
+fbtn_mask[i].style.posTop=-30; 
+fbtn[i].index=i; 
+fbtn[i].style.display="block"; 
+fbtn[i].onmouseover=function(){ 
+if(!current){ 
+current=this; 
+domove(this.index); 
+} 
+else 
+if(current!=this){ 
+domove(current.index); 
+domove(this.index); 
+current=this; 
+} 
+} 
+fbtn[i].onmouseout=function(){ 
+if(event.toElement==this.parentElement&t==this){ 
+domove(this.index); 
+current=null; 
+} 
+} 
+} 
+function domove(num){ 
+var o=fbtn_txt[num]; 
+var m=fbtn_mask[num]; 
+if(o.style.posTop<-60){ 
+o.style.display="none"; 
+var t=o.children[1].innerHTML; 
+o.children[1].innerHTML=o.children[0].innerHTML; 
+o.children[0].innerHTML=t; 
+o.style.posTop=-30; 
+o.style.display="block"; 
+if(m.style.posTop>30) 
+m.style.posTop=-30; 
+else 
+m.style.posTop=0; 
+} 
+else{ 
+m.style.posTop+=3; 
+o.style.posTop-=3; 
+setTimeout('domove('+num+')',15); 
+} 
+} 
+</script> 
+<script language="JavaScript">
+var a_Colour='red'; <!--第一个轨迹的颜色-->
+var b_Colour='blue'; <!--第二个轨迹的颜色-->
+var c_Colour='yellow'; <!--第三个轨迹的颜色-->
+var Size=120;
+var YDummy=new Array(),XDummy=new Array(),xpos=0,ypos=0,ThisStep=0;step=0.6;
+document.all <!--如果是ie浏览器-->
+{ //欢迎来到脚本之家，我们的网址是www.script100.com，很好记，zz站长，js就是js特效，本站收集大量高质量js代码，还有许多广告代码下载。
+function ieMouse(){
+xpos = document.body.scrollLeft+event.x+6; <!--获得现在鼠标的横坐标-->
+ypos = document.body.scrollTop+event.y+16; <!--获得现在鼠标的纵坐标-->
+}
+document.onmousemove = ieMouse;
+} 
+function swirl(){
+for (i = 0; i < 3; i++) <!--依次处理三个轨迹-->
+{
+YDummy[i]=ypos+Size*Math.sin((1*Math.sin((ThisStep)/10))+i*2)*Math.sin((ThisStep)/4); <!--计算得到第i个轨迹上每一点的横坐标-->
+XDummy[i]=xpos+Size*Math.cos((1*Math.sin((ThisStep)/10))+i*2)*Math.sin((ThisStep)/4); <!--计算得到第i个轨迹上每一点的纵坐标-->
+}
+ThisStep+=step;
+setTimeout('swirl()',10); <!--周期性调用swirl函数-->
+}
+var amount=10;
+if ( document.all){ <!--如果是ie浏览器-->
+document.write(' <div id="ODiv" style="position:absolute;top:0px;left:0px">'
++' <div id="IDiv" style="position:relative">');
+for (i = 0; i < amount; i++) <!--依次处理每一个点-->
+{
+document.write(' <div id=x style="position:absolute;top:0px;left:0px;width:'+i/2+';height:'+i/2+';background:'+a_Colour+';font-size:'+i/2+'"> </div>'); <!--第一个轨迹所在的页面-->
+document.write(' <div id=y style="position:absolute;top:0px;left:0px;width:'+i/2+';height:'+i/2+';background:'+b_Colour+';font-size:'+i/2+'"> </div>'); <!--第二个轨迹所在的页面-->
+document.write(' <div id=z style="position:absolute;top:0px;left:0px;width:'+i/2+';height:'+i/2+';background:'+c_Colour+';font-size:'+i/2+'"> </div>'); <!--第三个轨迹所在的页面-->
+}
+document.write(' </div> </div>');
+}
+function prepos(){
+var msie=document.all; <!--获得ie浏览器的当前页面-->
+if(document.all){ <!--如果是ie浏览器-->
+for (i = 0; i < amount; i++) <!--依次处理每一个点-->
+{
+if (i < amount-1) <!--对于前amount－1个点-->
+{
+msie.x[i].style.top=msie.x[i+1].style.top;msie.x[i].style.left=msie.x[i+1].style.left; <!--更新第一个轨迹上各个点上的上边界和左边界-->
+msie.y[i].style.top=msie.y[i+1].style.top;msie.y[i].style.left=msie.y[i+1].style.left; <!--更新第二个轨迹上各个点上的上边界和左边界-->
+msie.z[i].style.top=msie.z[i+1].style.top;msie.z[i].style.left=msie.z[i+1].style.left; <!--更新第三个轨迹上各个点上的上边界和左边界-->
+}
+else
+{
+msie.x[i].style.top=YDummy[0];msie.x[i].style.left=XDummy[0]; <!--更新第一个轨迹上最后一个点上的上边界和左边界-->
+msie.y[i].style.top=YDummy[1];msie.y[i].style.left=XDummy[1]; <!--更新第二个轨迹上最后一个点上的上边界和左边界-->
+msie.z[i].style.top=YDummy[2];msie.z[i].style.left=XDummy[2]; <!--更新第三个轨迹上最后一个点上的上边界和左边界-->
+}
+}
+}
+setTimeout("prepos()",10); <!--周期性调用prepos函数-->
+} 
+function Start(){ <!--开始函数-->
+swirl(),prepos() <!--依次调用swirl和prepos函数-->
+}
+window.onload=Start; <!--调用start函数-->
+</script>
+</div>
+<div class="STYLE1" id="lower">
+  <div align="center" class="STYLE3">Copyright &copy; 2014  by ccccccmd . All rights reserved.</div>
+</div>
+<img src="images/00.jpg" name="Image1" width="100%" height="100%" id="Image1" />
+</body>
+
+</html>

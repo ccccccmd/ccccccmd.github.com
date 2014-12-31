@@ -1,0 +1,135 @@
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>We are in the darkness</title>
+<style>
+* { margin:0; padding:0; }
+#words {
+	position:absolute;
+	width:476px;
+	height:395px;
+	z-index:1;
+	left: 10%;
+	top: 20%;
+	border-style: solid;
+	border-color:pink;
+	border-width: 1px;
+}
+.STYLE5 {font-family: "Courier New", Courier, monospace; font-size: 18px; color: #FFFF00; font-weight: bold; }
+.STYLE7 {font-size: 18px}
+.STYLE8 {
+	color: #CCFF00;
+	font-size: 12px;
+	font-weight: bold;
+}
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+	color: #FFFF00;
+}
+a:hover {
+	text-decoration: none;
+}
+a:active {
+	text-decoration: none;
+	color: #CCCCCC;
+}
+#Layer1 {
+	position:absolute;
+	width:200px;
+	height:115px;
+	z-index:2;
+	left: 669px;
+	top: 50%;
+}
+</style>
+</head>
+
+<body>
+<script language="JavaScript">
+var a_Colour='red'; <!--第一个轨迹的颜色-->
+var b_Colour='blue'; <!--第二个轨迹的颜色-->
+var c_Colour='yellow'; <!--第三个轨迹的颜色-->
+var Size=120;
+var YDummy=new Array(),XDummy=new Array(),xpos=0,ypos=0,ThisStep=0;step=0.6;
+document.all <!--如果是ie浏览器-->
+{ //欢迎来到脚本之家，我们的网址是www.script100.com，很好记，zz站长，js就是js特效，本站收集大量高质量js代码，还有许多广告代码下载。
+function ieMouse(){
+xpos = document.body.scrollLeft+event.x+6; <!--获得现在鼠标的横坐标-->
+ypos = document.body.scrollTop+event.y+16; <!--获得现在鼠标的纵坐标-->
+}
+document.onmousemove = ieMouse;
+} //欢迎来到脚本之家，我们的网址是www.script100.com，很好记，zz站长，js就是js特效，本站收集大量高质量js代码，还有许多广告代码下载。
+function swirl(){
+for (i = 0; i < 3; i++) <!--依次处理三个轨迹-->
+{
+YDummy[i]=ypos+Size*Math.sin((1*Math.sin((ThisStep)/10))+i*2)*Math.sin((ThisStep)/4); <!--计算得到第i个轨迹上每一点的横坐标-->
+XDummy[i]=xpos+Size*Math.cos((1*Math.sin((ThisStep)/10))+i*2)*Math.sin((ThisStep)/4); <!--计算得到第i个轨迹上每一点的纵坐标-->
+}
+ThisStep+=step;
+setTimeout('swirl()',10); <!--周期性调用swirl函数-->
+}
+var amount=10;
+if ( document.all){ <!--如果是ie浏览器-->
+document.write(' <div id="ODiv" style="position:absolute;top:0px;left:0px">'
++' <div id="IDiv" style="position:relative">');
+for (i = 0; i < amount; i++) <!--依次处理每一个点-->
+{
+document.write(' <div id=x style="position:absolute;top:0px;left:0px;width:'+i/2+';height:'+i/2+';background:'+a_Colour+';font-size:'+i/2+'"> </div>'); <!--第一个轨迹所在的页面-->
+document.write(' <div id=y style="position:absolute;top:0px;left:0px;width:'+i/2+';height:'+i/2+';background:'+b_Colour+';font-size:'+i/2+'"> </div>'); <!--第二个轨迹所在的页面-->
+document.write(' <div id=z style="position:absolute;top:0px;left:0px;width:'+i/2+';height:'+i/2+';background:'+c_Colour+';font-size:'+i/2+'"> </div>'); <!--第三个轨迹所在的页面-->
+}
+document.write(' </div> </div>');
+}
+function prepos(){
+var msie=document.all; <!--获得ie浏览器的当前页面-->
+if(document.all){ <!--如果是ie浏览器-->
+for (i = 0; i < amount; i++) <!--依次处理每一个点-->
+{
+if (i < amount-1) <!--对于前amount－1个点-->
+{
+msie.x[i].style.top=msie.x[i+1].style.top;msie.x[i].style.left=msie.x[i+1].style.left; <!--更新第一个轨迹上各个点上的上边界和左边界-->
+msie.y[i].style.top=msie.y[i+1].style.top;msie.y[i].style.left=msie.y[i+1].style.left; <!--更新第二个轨迹上各个点上的上边界和左边界-->
+msie.z[i].style.top=msie.z[i+1].style.top;msie.z[i].style.left=msie.z[i+1].style.left; <!--更新第三个轨迹上各个点上的上边界和左边界-->
+}
+else
+{//欢迎来到脚本之家，我们的网址是www.script100.com，很好记，zz站长，js就是js特效，本站收集大量高质量js代码，还有许多广告代码下载。
+msie.x[i].style.top=YDummy[0];msie.x[i].style.left=XDummy[0]; <!--更新第一个轨迹上最后一个点上的上边界和左边界-->
+msie.y[i].style.top=YDummy[1];msie.y[i].style.left=XDummy[1]; <!--更新第二个轨迹上最后一个点上的上边界和左边界-->
+msie.z[i].style.top=YDummy[2];msie.z[i].style.left=XDummy[2]; <!--更新第三个轨迹上最后一个点上的上边界和左边界-->
+}
+}
+}
+setTimeout("prepos()",10); <!--周期性调用prepos函数-->
+} //欢迎来到脚本之家，我们的网址是www.script100.com，很好记，zz站长，js就是js特效，本站收集大量高质量js代码，还有许多广告代码下载。
+function Start(){ <!--开始函数-->
+swirl(),prepos() <!--依次调用swirl和prepos函数-->
+}
+window.onload=Start; <!--调用start函数-->
+</script>
+<div id="words">
+  <table width="100%" height="100%" border="1Px"
+  sytle="link">
+    <tr>
+      <td height="82"><span class="STYLE5"><a href="artical1.html">Network Security --Why it matters?</a></span></td>
+    </tr>
+    <tr>
+      <td><h1 class="STYLE7"><span class="STYLE5"><a href="artical2.html">he Hacker Way and the Art of the Founder</a></span></h1></td>
+    </tr>
+    <tr>
+      <td><span class="STYLE5"><a href="artical3.html">Zuckerberg Generously Allows World’s Poor </a></span></td>
+    </tr>
+    <tr>
+      <td><span class="STYLE5"><a href="artical4 .html">Facebook Is Trying to Buy Its Way Into the Developing World</a></span></td>
+    </tr>
+    <tr>
+      <td><span class="STYLE5"><a href="artical5.html">As Twitter IPO Looms, Facebook Turns on Instagram Ads</a></span></td>
+    </tr>
+  </table>
+</div>
+<img src="images/1.png" width="100%" height="100%" />
+<div id="Layer1"><a href="home.html"><img src="images/circle.png" width="50" height="50" border="0"></a></div>
+</body>
+</html>
