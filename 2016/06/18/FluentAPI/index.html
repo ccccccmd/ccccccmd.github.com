@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>FluentAPI | 403</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="FluentAPI 简介 Code Frist模式中，EF提供了很多不同DataAnnotations的特性来让我们重写默认的Conventions约定，比如，默认ID字段或ClassName+Id字段是表的Primary key。 FluentAI 是另外一种方式来配置我们的Entity，他最中产生的效果和DataAnnotations的注解是一样的，">
+<meta name="keywords" content="EF,FluentAPI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FluentAPI">
+<meta property="og:url" content="http://ccccccmd.rootu.cn/2016/06/18/FluentAPI/index.html">
+<meta property="og:site_name" content="403">
+<meta property="og:description" content="FluentAPI 简介 Code Frist模式中，EF提供了很多不同DataAnnotations的特性来让我们重写默认的Conventions约定，比如，默认ID字段或ClassName+Id字段是表的Primary key。 FluentAI 是另外一种方式来配置我们的Entity，他最中产生的效果和DataAnnotations的注解是一样的，">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-05-29T09:45:53.301Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FluentAPI">
+<meta name="twitter:description" content="FluentAPI 简介 Code Frist模式中，EF提供了很多不同DataAnnotations的特性来让我们重写默认的Conventions约定，比如，默认ID字段或ClassName+Id字段是表的Primary key。 FluentAI 是另外一种方式来配置我们的Entity，他最中产生的效果和DataAnnotations的注解是一样的，">
+  
+    <link rel="alternative" href="/atom.xml" title="403" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.png" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">ccccccmd</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Net-Core/" style="font-size: 15px;">.Net Core</a> <a href="/tags/ABP/" style="font-size: 15px;">ABP</a> <a href="/tags/Asp-net-Core/" style="font-size: 10px;">Asp.net Core</a> <a href="/tags/Autofac/" style="font-size: 15px;">Autofac</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C/" style="font-size: 10px;">C#</a> <a href="/tags/Cqrs/" style="font-size: 10px;">Cqrs</a> <a href="/tags/DDD/" style="font-size: 10px;">DDD</a> <a href="/tags/DataTracking/" style="font-size: 10px;">DataTracking</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/EF/" style="font-size: 20px;">EF</a> <a href="/tags/Event-Bus/" style="font-size: 10px;">Event Bus</a> <a href="/tags/Exceptionless/" style="font-size: 10px;">Exceptionless</a> <a href="/tags/Expression-Tree/" style="font-size: 10px;">Expression Tree</a> <a href="/tags/FluentAPI/" style="font-size: 10px;">FluentAPI</a> <a href="/tags/Ghost/" style="font-size: 10px;">Ghost</a> <a href="/tags/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/IIS/" style="font-size: 10px;">IIS</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Local-Data/" style="font-size: 10px;">Local Data</a> <a href="/tags/MediatR/" style="font-size: 10px;">MediatR</a> <a href="/tags/MiniProfiler/" style="font-size: 10px;">MiniProfiler</a> <a href="/tags/ModelFirst/" style="font-size: 10px;">ModelFirst</a> <a href="/tags/PHP入门/" style="font-size: 10px;">PHP入门</a> <a href="/tags/POCO/" style="font-size: 10px;">POCO</a> <a href="/tags/Proxy/" style="font-size: 10px;">Proxy</a> <a href="/tags/Quartz-Net/" style="font-size: 10px;">Quartz.Net</a> <a href="/tags/RDS/" style="font-size: 10px;">RDS</a> <a href="/tags/RDS-Others/" style="font-size: 10px;">RDS Others</a> <a href="/tags/S3/" style="font-size: 10px;">S3</a> <a href="/tags/TYK/" style="font-size: 10px;">TYK</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/angular-js/" style="font-size: 10px;">angular.js</a> <a href="/tags/async/" style="font-size: 10px;">async</a> <a href="/tags/cqrs/" style="font-size: 10px;">cqrs</a> <a href="/tags/distributed-lock/" style="font-size: 10px;">distributed lock</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/hangfire/" style="font-size: 10px;">hangfire</a> <a href="/tags/kibana/" style="font-size: 10px;">kibana</a> <a href="/tags/masstransit/" style="font-size: 10px;">masstransit</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/webclient/" style="font-size: 10px;">webclient</a> <a href="/tags/wordpress/" style="font-size: 10px;">wordpress</a> <a href="/tags/任务调度/" style="font-size: 10px;">任务调度</a> <a href="/tags/分布式锁/" style="font-size: 10px;">分布式锁</a> <a href="/tags/微信支付/" style="font-size: 10px;">微信支付</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://www.rootu.cn">Backup</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">ccccccmd</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.png" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">ccccccmd</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-FluentAPI" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/06/18/FluentAPI/" class="article-date">
+      <time datetime="2016-06-18T06:25:03.000Z" itemprop="datePublished">2016-06-18</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      FluentAPI
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/EntityFramework/">EntityFramework</a><a class="article-category-link" href="/categories/EntityFramework/Net/">.Net</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/EF/">EF</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/FluentAPI/">FluentAPI</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="FluentAPI-简介"><a href="#FluentAPI-简介" class="headerlink" title="FluentAPI 简介"></a>FluentAPI 简介</h2><p> Code Frist模式中，EF提供了很多不同<code>DataAnnotations</code>的特性来让我们重写默认的<code>Conventions</code>约定，比如，默认<strong>ID</strong>字段或<strong>ClassName+Id</strong>字段是表的<strong>Primary key</strong>。</p>
+<p><code>FluentAI</code> 是另外一种方式来配置我们的Entity，他最中产生的效果和<code>DataAnnotations</code>的注解是一样的，<a id="more"></a>但是<code>FluentAPI</code> 可以提供更灵活，更强大的配置方式。</p>
+<h2 id="FluentAPI-使用"><a href="#FluentAPI-使用" class="headerlink" title="FluentAPI 使用"></a>FluentAPI 使用</h2><p>实验环境：<strong>vs 2015 update2/   Entity Fromework 6.1.3/  C# 6.0/Sql Server 2008 r2</strong></p>
+<p>我们是通过重写<code>OnModelCreating</code>这个方法得到FluentApi的入口的。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class SchoolContext: DbContext </span><br><span class="line">&#123;</span><br><span class="line">    public SchoolDBContext(): base() </span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public DbSet&lt;Student&gt; Students &#123; get; <span class="built_in">set</span>; &#125;</span><br><span class="line">    public DbSet&lt;Standard&gt; Standards &#123; get; <span class="built_in">set</span>; &#125;</span><br><span class="line">        </span><br><span class="line">    protected override void OnModelCreating(DbModelBuilder modelBuilder)</span><br><span class="line">    &#123;</span><br><span class="line">        //我们可以通过modelBuilder来配置我们的class了</span><br><span class="line"></span><br><span class="line">        base.OnModelCreating(modelBuilder);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面是一些具体的配置，我只记录一些常用的，比较重要的，高级还没有研究透，详细可到<a href="https://msdn.microsoft.com/zh-cn/data/ee712907" target="_blank" rel="noopener">这里</a>查看。</p>
+<h3 id="Map-Entity-to-Table-改变实体类到数据库的表映射关系"><a href="#Map-Entity-to-Table-改变实体类到数据库的表映射关系" class="headerlink" title="Map Entity to Table 改变实体类到数据库的表映射关系"></a>Map Entity to Table 改变实体类到数据库的表映射关系</h3><blockquote>
+<p> modelBuilder.Entity<student>().ToTable(“StudentData”);//<strong>Student</strong>迁移时，在数据库生成的表名就是<strong>StudentData</strong><br>   modelBuilder.Entity<course>().ToTable(“CourseDetail”);<br> modelBuilder.HasDefaultSchema(“Admin”);//生成的表，都有一个默认的前缀<strong>Admin</strong></course></student></p>
+</blockquote>
+<p>若果用到的领域模型，在Domain的映射中，还可以这么玩：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//Map entity to table</span><br><span class="line"> modelBuilder.Entity&lt;Student&gt;().Map(sd ⇒ &#123;</span><br><span class="line">    sd.Properties(p ⇒ new &#123; p.ID, p.FirstMidName, p.LastName &#125;);</span><br><span class="line">    sd.ToTable(<span class="string">"StudentData"</span>);</span><br><span class="line"> &#125;)</span><br><span class="line"> .Map(si ⇒ &#123;</span><br><span class="line">    si.Properties(p ⇒ new &#123; p.ID, p.EnrollmentDate &#125;);</span><br><span class="line">    si.ToTable(<span class="string">"StudentEnrollmentInfo"</span>);</span><br><span class="line"> &#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="Properties-Mapping-类字段的约束"><a href="#Properties-Mapping-类字段的约束" class="headerlink" title="Properties Mapping 类字段的约束"></a>Properties Mapping 类字段的约束</h3><p>设置主键：</p>
+<blockquote>
+<p>modelBuilder.Entity<student>().HasKey<int>(s ⇒ s.StdntID);</int></student></p>
+</blockquote>
+<p>配置组合主键：</p>
+<blockquote>
+<p>modelBuilder.Entity<department>().HasKey(t =&gt; new { t.DepartmentID, t.Name });</department></p>
+</blockquote>
+<p>指定字段名字，长度，是否必填,字段类型等等：</p>
+<blockquote>
+<p>modelBuilder.Entity<syscity>().Property(c =&gt; c.EnglishName).HasColumnName(“ct”).HasMaxLength(200).HasColumnType(“varchar”).IsOptional(); </syscity></p>
+</blockquote>
+<p>其他稀奇古怪的，直接搬example:</p>
+<p>1.关闭自增：</p>
+<blockquote>
+<p>modelBuilder.Entity<department>().Property(t =&gt; t.DepartmentID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);</department></p>
+</blockquote>
+<p>2.指定不映射到数据库中的列，这个列可能是我们自己定义的:  不解：<code>DataAnnotations</code>中我们好像没有标记？</p>
+<blockquote>
+<p>modelBuilder.Entity<department>().Ignore(t =&gt; t.Budget);</department></p>
+</blockquote>
+<p>3.配置字符串属性是否支持 Unicode 内容,就是sql server 中的nvarchar。默认Unicode是存储为Nvarchar的</p>
+<blockquote>
+<p>modelBuilder.Entity<department>() .Property(t =&gt; t.Name) .IsUnicode(false);</department></p>
+</blockquote>
+<p>4.高级：后续研究</p>
+<blockquote>
+<p>将属性配置为用作乐观并发令牌</p>
+<p>将类指定为复杂类型(没有指定主键的都是复杂类型)</p>
+<p>映射“每个层次结构一张表 (TPH)”继承</p>
+<p>映射“每个类型一张表 (TPT)”继承</p>
+<p>映射“每个具体类一张表 (TPC)”继承</p>
+<p>将多个实体类型映射到数据库中的一个表（表拆分）</p>
+</blockquote>
+<h2 id="FluentAPI中的关系操作"><a href="#FluentAPI中的关系操作" class="headerlink" title="FluentAPI中的关系操作"></a>FluentAPI中的关系操作</h2><h3 id="1对0或1"><a href="#1对0或1" class="headerlink" title="1对0或1"></a>1对0或1</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">modelBuilder.Entity&lt;Student&gt;()</span><br><span class="line">               .HasOptional(s =&gt; s.Address) </span><br><span class="line">               .WithRequired(ad =&gt; ad.Student);//此时的主键生成在Id_Id</span><br></pre></td></tr></table></figure>
+<p>此时生成的foreign key的关系是两个Id</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">modelBuilder.Entity&lt;Author&gt;().HasOptional(c =&gt; c.Address).WithOptionalPrincipal(c =&gt; c.Author).WillCascadeOnDelete(<span class="literal">false</span> );//此时的主键生成在 Address 上</span><br></pre></td></tr></table></figure>
+<p>这样，也会发现<code>WithOptionalPrincipal</code> 和 <code>WithOptionalDependent</code>的区别了</p>
+<p>迁移数据是这样的：自动生成Author_Id<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> CreateTable(</span><br><span class="line">                <span class="string">"dbo.Addresses"</span>,</span><br><span class="line">                c =&gt; new</span><br><span class="line">                    &#123;</span><br><span class="line">                        Id = c.Int(nullable: <span class="literal">false</span>, identity: <span class="literal">true</span>),</span><br><span class="line">                        Location = c.String(),</span><br><span class="line">                        Author_Id = c.Int(),</span><br><span class="line">                    &#125;)</span><br><span class="line">                .PrimaryKey(t =&gt; t.Id)</span><br><span class="line">                .ForeignKey(<span class="string">"dbo.Authors"</span>, t =&gt; t.Author_Id)</span><br><span class="line">                .Index(t =&gt; t.Author_Id);</span><br><span class="line"></span><br><span class="line">当然也可以改foreign key 的名字</span><br><span class="line"> modelBuilder.Entity&lt;Author&gt;().HasOptional(c =&gt; c.Address).WithOptionalPrincipal(c =&gt; c.Author).Map( c=&gt;c.MapKey( <span class="string">"AuthorId"</span>)).WillCascadeOnDelete(<span class="literal">false</span> );</span><br><span class="line">但是Model中不应该有AuthorId这个字段</span><br></pre></td></tr></table></figure></p>
+<h3 id="1对1"><a href="#1对1" class="headerlink" title="1对1"></a>1对1</h3><p>用的不多，测试下，也要指定外键。<strong>我认为</strong>本来这种一对一的关系sql server是根本不能实现的，相当于双外键，矛盾了.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">modelBuilder.Entity&lt;Author&gt;().HasRequired(c =&gt; c.Address).WithRequiredPrincipal(c=&gt;c.Author).Map( c=&gt;c.MapKey( <span class="string">"AuthorId"</span>)).WillCascadeOnDelete(<span class="literal">false</span> );</span><br></pre></td></tr></table></figure></p>
+<p>如果想删除一个话：<code>“Author_Address”AssociationSet 中的关系处于“Deleted”状态。如果有多重性约束，则相应的“Author_Address_Source”也必须处于“Deleted”状态。</code></p>
+<p>删除的话，应该这样做：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var au = ef.Authors.Find(1);</span><br><span class="line">var k = au.Address;</span><br><span class="line">ef.Authors.Remove(au);</span><br><span class="line">ef.Addresses.Remove(k);</span><br></pre></td></tr></table></figure></p>
+<p><strong>我认为</strong>：这个约束是EF帮我们约束的，因为我们发现1对1和 1对0或1生成的迁移数据都是一样的。</p>
+<p>1对<em>的两个测试Model,可以很明显的区别于</em>to Many</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public class Address</span><br><span class="line">    &#123;</span><br><span class="line">        public int Id &#123; get; <span class="built_in">set</span>; &#125;</span><br><span class="line">        public string Location &#123; get; <span class="built_in">set</span>; &#125;=<span class="string">""</span>;</span><br><span class="line">        public virtual Author Author  &#123;get; <span class="built_in">set</span>; &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public class Author</span><br><span class="line">    &#123;</span><br><span class="line">        public int Id &#123; get; <span class="built_in">set</span>; &#125;</span><br><span class="line">        public string Name &#123; get; <span class="built_in">set</span>; &#125; = <span class="string">""</span>;</span><br><span class="line">        public virtual List&lt; Article &gt; Articles &#123; get; <span class="built_in">set</span>; &#125;</span><br><span class="line">        public virtual Address Address &#123; get; <span class="built_in">set</span>; &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="1对多"><a href="#1对多" class="headerlink" title="1对多"></a>1对多</h3><p>一对多就很简单了，不会和上面两种那样绕：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">modelBuilder.Entity&lt;Article&gt;()</span><br><span class="line">                .HasRequired(c =&gt; c.Author)</span><br><span class="line">                .WithMany(c =&gt; c.Articles)</span><br><span class="line">                .HasForeignKey(c =&gt; c.AuthorId).WillCascadeOnDelete(<span class="literal">false</span>);</span><br></pre></td></tr></table></figure></p>
+<h3 id="多对多"><a href="#多对多" class="headerlink" title="多对多"></a>多对多</h3><p>多对多会生成一个新的关联表</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">modelBuilder.Entity&lt;Blog&gt;().HasMany(c =&gt; c.Authors).WithMany(c =&gt; c.Blogs).Map( c=&gt;c.ToTable( <span class="string">"Blogs_Authors"</span>));</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><code>FluentAPI</code>的操作方式确实是很方便，但是比<code>DataAnnotations</code>的方式难理解。</p>
+<p><code>FluentAPI</code>在数据库迁移，和领域驱动里的Model First中应用最为广泛。</p>
+<p>EF的数据库迁移功能非常强大，本次FluentAPI的变动都是直接迁移对比的。</p>
+<p>部分参考地址，英语不好就是完蛋：</p>
+<p><a href="http://www.entityframeworktutorial.net/EntityFramework5/entity-framework5-introduction.aspx" target="_blank" rel="noopener">entityframeworktutorial</a> </p>
+<p><a href="https://msdn.microsoft.com/en-US/data/jj679962.aspx" target="_blank" rel="noopener">微软MSDN</a> </p>
+<p> <a href="http://www.tutorialspoint.com/entity_framework/entity_framework_fluent_api.htm" target="_blank" rel="noopener">tutorialspoint</a></p>
+<p><a href="http://stackoverflow.com/search?q=FluentAPi" target="_blank" rel="noopener">Stackoverflow</a></p>
+<h2 id="待续。。。"><a href="#待续。。。" class="headerlink" title="待续。。。:)"></a>待续。。。:)</h2>
+      
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2016/06/18/FluentAPI/">FluentAPI</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 ccccccmd 的个人博客">ccccccmd</a></p>
+        <p><span>发布时间:</span>2016年06月18日 - 14时25分</p>
+        <p><span>最后更新:</span>2017年05月29日 - 17时45分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2016/06/18/FluentAPI/" title="FluentAPI">http://ccccccmd.rootu.cn/2016/06/18/FluentAPI/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://ccccccmd.rootu.cn/2016/06/18/FluentAPI/　　作者: ccccccmd" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2016/06/19/ModelFirstInExistDb/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          ModelFirstInExistDb
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/06/11/Heox-博客搭建/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Hexo 博客搭建</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#FluentAPI-简介"><span class="toc-number">1.</span> <span class="toc-text">FluentAPI 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FluentAPI-使用"><span class="toc-number">2.</span> <span class="toc-text">FluentAPI 使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Map-Entity-to-Table-改变实体类到数据库的表映射关系"><span class="toc-number">2.1.</span> <span class="toc-text">Map Entity to Table 改变实体类到数据库的表映射关系</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Properties-Mapping-类字段的约束"><span class="toc-number">2.2.</span> <span class="toc-text">Properties Mapping 类字段的约束</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FluentAPI中的关系操作"><span class="toc-number">3.</span> <span class="toc-text">FluentAPI中的关系操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1对0或1"><span class="toc-number">3.1.</span> <span class="toc-text">1对0或1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1对1"><span class="toc-number">3.2.</span> <span class="toc-text">1对1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1对多"><span class="toc-number">3.3.</span> <span class="toc-text">1对多</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多对多"><span class="toc-number">3.4.</span> <span class="toc-text">多对多</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#待续。。。"><span class="toc-number">5.</span> <span class="toc-text">待续。。。:)</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+
+
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/06/19/ModelFirstInExistDb/" title="上一篇: ModelFirstInExistDb">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2016/06/11/Heox-博客搭建/" title="下一篇: Hexo 博客搭建">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/08/04/wordpress-via-docker/">docker-compose 的方式安装 wordpress</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/">在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/20/abp-on-linux/">abp core on centos</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/14/iis-net-core/">Asp.net core on IIS</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/07/await-and-async/">await和async</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/EFBulkInsert/">EF中的批量插入</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/mongodb/">mongodb</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/hangfire/">hangfire</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/distributed-lock/">分布式锁Foundatio.Lock</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/cqrs/">使用消息总线 masstransit</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/vue/">使用Vue.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/25/rabbitmq/">rabbitmq</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/24/ELK/">ELK</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Net Core On Linux/">.Net Core On Linux</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Hexo/">Hexo迁移</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/NetCore/">.Net Core 中间件</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/tyk/">tyk-gateway</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/04/04/Autofac-二/">Autofac(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/30/CLR/">CLR 总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-Others/">AWS 其他产品</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-RDS/">AWS RDS</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-S3/">AWS S3</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/13/autofac/">Autofac(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/16/java-review/">java-review</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/identityserver/">identityserver</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/abp-angular/">ABP and Angular</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/docker/">Docker</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/探索angular/">angular.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/表达式树-一/">表达式树(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/15/微信支付/">微信支付</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/MiniProfiler/">MiniProfiler</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/cdn-image-cqrs/">cdn-image-cqrs</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/webclient-timeout/">webclient-timeout</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/24/EF中的Attach和Entry/">EF中的Attach和Entry</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/16/ghost升级/">Ghost升级</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/15/Exceptionless-本地部署/">Exceptionless 本地部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/03/Quartz-net/">Quartz.net（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/01/mysqlfirst/">mysqlfirst</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/EF的One to Zero,One关系/">EF的One to Zero,One关系</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/17/phpfirst/">PHP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/03/eftrackingandstate/">EF的实体追踪/动态代理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/02/eflocaldata/">使用EF的本地数据</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/01/EntityFramework/">EF加载实体的三种模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/29/abp-begin/">ABP起步</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/19/ModelFirstInExistDb/">ModelFirstInExistDb</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/18/FluentAPI/">FluentAPI</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/11/Heox-博客搭建/">Hexo 博客搭建</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2018 ccccccmd
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> 
+				<p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 3;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

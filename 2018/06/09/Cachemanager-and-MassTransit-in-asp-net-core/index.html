@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁 | 403</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在asp.net core 中使用CacheManager 以使用reids为例：  安装以下package: CacheManager.Microsoft.Extensions.Configuration和CacheManager.StackExchange.Redis 和CacheManager.Serialization.Json  Startup 中增加如下配置： 123456789101">
+<meta name="keywords" content="Asp.net Core,分布式锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁">
+<meta property="og:url" content="http://ccccccmd.rootu.cn/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/index.html">
+<meta property="og:site_name" content="403">
+<meta property="og:description" content="在asp.net core 中使用CacheManager 以使用reids为例：  安装以下package: CacheManager.Microsoft.Extensions.Configuration和CacheManager.StackExchange.Redis 和CacheManager.Serialization.Json  Startup 中增加如下配置： 123456789101">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-06-11T08:55:17.268Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁">
+<meta name="twitter:description" content="在asp.net core 中使用CacheManager 以使用reids为例：  安装以下package: CacheManager.Microsoft.Extensions.Configuration和CacheManager.StackExchange.Redis 和CacheManager.Serialization.Json  Startup 中增加如下配置： 123456789101">
+  
+    <link rel="alternative" href="/atom.xml" title="403" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.png" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">ccccccmd</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Net-Core/" style="font-size: 15px;">.Net Core</a> <a href="/tags/ABP/" style="font-size: 15px;">ABP</a> <a href="/tags/Asp-net-Core/" style="font-size: 10px;">Asp.net Core</a> <a href="/tags/Autofac/" style="font-size: 15px;">Autofac</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C/" style="font-size: 10px;">C#</a> <a href="/tags/Cqrs/" style="font-size: 10px;">Cqrs</a> <a href="/tags/DDD/" style="font-size: 10px;">DDD</a> <a href="/tags/DataTracking/" style="font-size: 10px;">DataTracking</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/EF/" style="font-size: 20px;">EF</a> <a href="/tags/Event-Bus/" style="font-size: 10px;">Event Bus</a> <a href="/tags/Exceptionless/" style="font-size: 10px;">Exceptionless</a> <a href="/tags/Expression-Tree/" style="font-size: 10px;">Expression Tree</a> <a href="/tags/FluentAPI/" style="font-size: 10px;">FluentAPI</a> <a href="/tags/Ghost/" style="font-size: 10px;">Ghost</a> <a href="/tags/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/IIS/" style="font-size: 10px;">IIS</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Local-Data/" style="font-size: 10px;">Local Data</a> <a href="/tags/MediatR/" style="font-size: 10px;">MediatR</a> <a href="/tags/MiniProfiler/" style="font-size: 10px;">MiniProfiler</a> <a href="/tags/ModelFirst/" style="font-size: 10px;">ModelFirst</a> <a href="/tags/PHP入门/" style="font-size: 10px;">PHP入门</a> <a href="/tags/POCO/" style="font-size: 10px;">POCO</a> <a href="/tags/Proxy/" style="font-size: 10px;">Proxy</a> <a href="/tags/Quartz-Net/" style="font-size: 10px;">Quartz.Net</a> <a href="/tags/RDS/" style="font-size: 10px;">RDS</a> <a href="/tags/RDS-Others/" style="font-size: 10px;">RDS Others</a> <a href="/tags/S3/" style="font-size: 10px;">S3</a> <a href="/tags/TYK/" style="font-size: 10px;">TYK</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/angular-js/" style="font-size: 10px;">angular.js</a> <a href="/tags/async/" style="font-size: 10px;">async</a> <a href="/tags/cqrs/" style="font-size: 10px;">cqrs</a> <a href="/tags/distributed-lock/" style="font-size: 10px;">distributed lock</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/hangfire/" style="font-size: 10px;">hangfire</a> <a href="/tags/kibana/" style="font-size: 10px;">kibana</a> <a href="/tags/masstransit/" style="font-size: 10px;">masstransit</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/webclient/" style="font-size: 10px;">webclient</a> <a href="/tags/wordpress/" style="font-size: 10px;">wordpress</a> <a href="/tags/任务调度/" style="font-size: 10px;">任务调度</a> <a href="/tags/分布式锁/" style="font-size: 10px;">分布式锁</a> <a href="/tags/微信支付/" style="font-size: 10px;">微信支付</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://www.rootu.cn">Backup</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">ccccccmd</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.png" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">ccccccmd</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Cachemanager-and-MassTransit-in-asp-net-core" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/" class="article-date">
+      <time datetime="2018-06-09T05:10:28.000Z" itemprop="datePublished">2018-06-09</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Asp-net-Core/">Asp.net Core</a><a class="article-category-link" href="/categories/Asp-net-Core/Cachemanger/">Cachemanger</a><a class="article-category-link" href="/categories/Asp-net-Core/Cachemanger/MassTransit/">MassTransit</a><a class="article-category-link" href="/categories/Asp-net-Core/Cachemanger/MassTransit/Foundatio/">Foundatio</a><a class="article-category-link" href="/categories/Asp-net-Core/Cachemanger/MassTransit/Foundatio/分布式锁/">分布式锁</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Asp-net-Core/">Asp.net Core</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/分布式锁/">分布式锁</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="在asp-net-core-中使用CacheManager"><a href="#在asp-net-core-中使用CacheManager" class="headerlink" title="在asp.net core 中使用CacheManager"></a>在asp.net core 中使用CacheManager</h2><ul>
+<li><p>以使用reids为例：</p>
+</li>
+<li><p>安装以下package: <code>CacheManager.Microsoft.Extensions.Configuration</code>和<code>CacheManager.StackExchange.Redis</code> 和<code>CacheManager.Serialization.Json</code></p>
+</li>
+<li><p>Startup 中增加如下配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">services.AddCacheManagerConfiguration(</span><br><span class="line">          builder =&gt;</span><br><span class="line">              builder.WithJsonSerializer().WithRedisConfiguration(<span class="string">"lottery"</span>, Configuration.GetConnectionString(<span class="string">"RedisConnStr"</span>))</span><br><span class="line">                  .WithMaxRetries(100) // 尝试次数</span><br><span class="line">                  .WithRetryTimeout(100) // 尝试超时时间</span><br><span class="line">                  .WithRedisBackplane(<span class="string">"lottery"</span>) // redis 使用 Back Plate</span><br><span class="line">                  .WithRedisCacheHandle(<span class="string">"lottery"</span>, <span class="literal">true</span>)</span><br><span class="line">                  ); //redis 缓存 handle);</span><br><span class="line">services.AddCacheManager();</span><br><span class="line">services.AddSingleton&lt;ICacheProvider&gt;(provider =&gt; new CacheManagerProvider(provider.GetRequiredService&lt;ICacheManager&lt;object&gt;&gt;())</span><br><span class="line">      );</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<a id="more"></a>
+<ul>
+<li><p>建议封装一下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public interface ICacheProvider</span><br><span class="line"> &#123;</span><br><span class="line">       bool SetCache(string key, object value);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">public class CacheManagerProvider : ICacheProvider</span><br><span class="line"> &#123;</span><br><span class="line">     private <span class="built_in">readonly</span> ICacheManager&lt;object&gt; _cacheManger;</span><br><span class="line"></span><br><span class="line">     public CacheManagerProvider(ICacheManager&lt;object&gt; cacheManager)</span><br><span class="line">     &#123;           </span><br><span class="line">         _cacheManger = cacheManager;</span><br><span class="line">     &#125;  </span><br><span class="line">         public bool SetCache(string key, object value)</span><br><span class="line">     &#123;</span><br><span class="line">         <span class="built_in">return</span> _cacheManger.AddOrUpdate(key, value, v =&gt; value) != null;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用cachemanager:</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">private <span class="built_in">readonly</span> ICacheProvider _provider;</span><br><span class="line">public ValuesController(ICacheProvider provider)</span><br><span class="line">&#123;</span><br><span class="line">    _provider = provider;</span><br><span class="line">&#125;    </span><br><span class="line">_provider.SetCache(<span class="string">"aaaa"</span>, <span class="string">"hellll"</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="使用asp-net-core-的redis"><a href="#使用asp-net-core-的redis" class="headerlink" title="使用asp.net core 的redis"></a>使用asp.net core 的redis</h2><ul>
+<li><p>安装package <code>Microsoft.Extensions.Caching.Redis</code> </p>
+</li>
+<li><p>startup中做如下配置</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">services.AddDistributedRedisCache(option =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    option.Configuration = Configuration.GetConnectionString(<span class="string">"RedisConnStr"</span>);</span><br><span class="line">    option.InstanceName = <span class="string">"lottery"</span>;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用的时候，DI获取 <code>IDistributedCache</code>就可以了，当然了，还可以做个扩展</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public static class DistributedCacheExtension</span><br><span class="line">&#123;</span><br><span class="line">    public static Task SetAsync&lt;T&gt;(this IDistributedCache cache, string key, T entity, DistributedCacheEntryOptions options, CancellationToken token)</span><br><span class="line">    &#123;</span><br><span class="line">        using (MemoryStream ms = new MemoryStream())</span><br><span class="line">        &#123;</span><br><span class="line">            IFormatter iFormatter = new BinaryFormatter();</span><br><span class="line">            iFormatter.Serialize(ms, entity);</span><br><span class="line">            var buff = ms.GetBuffer();</span><br><span class="line">            <span class="built_in">return</span> cache.SetAsync(key, buff, options, token);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="在asp-net-core-中使用MassTransit"><a href="#在asp-net-core-中使用MassTransit" class="headerlink" title="在asp.net core 中使用MassTransit"></a>在asp.net core 中使用MassTransit</h2><ul>
+<li><p>安装一下package <code>MassTransit.RabbitMQ</code>和<code>MassTransit.Extensions.DependencyInjection</code></p>
+</li>
+<li><p>在startup中<code>ConfigureServices()</code>里做如下配置</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">private void RegisterBus(IServiceCollection services)</span><br><span class="line">      &#123;</span><br><span class="line">          services.AddScoped&lt;LotteryCompletedHandler&gt;();</span><br><span class="line"></span><br><span class="line">          services.AddMassTransit(x =&gt; &#123; x.AddConsumer&lt;LotteryCompletedHandler&gt;(); &#125;);</span><br><span class="line"></span><br><span class="line">          services.AddSingleton(provider =&gt; Bus.Factory.CreateUsingRabbitMq(cfg =&gt;</span><br><span class="line">          &#123;</span><br><span class="line">              var host = cfg.Host(new Uri(Configuration[<span class="string">"Rabbitmq:Connstr"</span>]), <span class="string">"LotteryMq"</span>, h =&gt;</span><br><span class="line">              &#123;</span><br><span class="line">                  h.Username(Configuration[<span class="string">"Rabbitmq:Username"</span>]);</span><br><span class="line">                  h.Password(Configuration[<span class="string">"Rabbitmq:Pass"</span>]);</span><br><span class="line">              &#125;);</span><br><span class="line"></span><br><span class="line">              var config = provider.GetRequiredService&lt;IOptions&lt;SysConfig&gt;&gt;().Value;</span><br><span class="line"></span><br><span class="line">              <span class="keyword">if</span> (config.IsMaster)</span><br><span class="line">              &#123;</span><br><span class="line">                  cfg.ReceiveEndpoint(host, <span class="string">"lottery-completed-queue"</span>,</span><br><span class="line">                      c =&gt; &#123; c.Consumer(() =&gt; new LotteryCompletedHandler()); &#125;);</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;));</span><br><span class="line">          services.AddSingleton&lt;IPublishEndpoint&gt;(provider =&gt; provider.GetRequiredService&lt;IBusControl&gt;());</span><br><span class="line">          services.AddSingleton&lt;ISendEndpointProvider&gt;(provider =&gt; provider.GetRequiredService&lt;IBusControl&gt;());</span><br><span class="line">          services.AddSingleton&lt;IBus&gt;(provider =&gt; provider.GetRequiredService&lt;IBusControl&gt;());</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>在 <code>Configure()</code>中开启bus</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime lifetime,</span><br><span class="line">            IBusControl bus)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (env.IsDevelopment())</span><br><span class="line">            &#123;</span><br><span class="line">                app.UseDeveloperExceptionPage();</span><br><span class="line">            &#125;</span><br><span class="line">            app.UseMvc();</span><br><span class="line">            lifetime.ApplicationStarted.Register(() =&gt; &#123; bus.StartAsync(); &#125;);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用bus</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">private <span class="built_in">readonly</span> IBus _bus;</span><br><span class="line">public ValuesController(IBus bus)</span><br><span class="line">&#123;</span><br><span class="line">    _bus = bus;</span><br><span class="line">&#125;</span><br><span class="line">var x=_bus.Publish(new <span class="function"><span class="title">LotteryCompleted</span></span>() &#123; Openid = <span class="string">"dddddd"</span> &#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="aps-net-core-中使用-Foundatio-Redis分布式锁"><a href="#aps-net-core-中使用-Foundatio-Redis分布式锁" class="headerlink" title="aps.net core 中使用 Foundatio.Redis分布式锁"></a>aps.net core 中使用 Foundatio.Redis分布式锁</h2><ul>
+<li><p>安装package <code>Foundatio.Redis</code></p>
+</li>
+<li><p>startup中配置如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">services.AddSingleton(sp =&gt;</span><br><span class="line">    new LockProviderInit(Configuration.GetConnectionString(<span class="string">"RedisConnStr"</span>)).InitProvider());</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>初始化LockProvider</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class LockProviderInit</span><br><span class="line">    &#123;</span><br><span class="line">        private <span class="built_in">readonly</span> string _redisStr;</span><br><span class="line">        public LockProviderInit(string redisStr)</span><br><span class="line">        &#123;</span><br><span class="line">            _redisStr = redisStr;</span><br><span class="line">        &#125;</span><br><span class="line">        public ILockProvider InitProvider()</span><br><span class="line">        &#123;</span><br><span class="line">            var muxer = ConnectionMultiplexer.Connect(_redisStr);</span><br><span class="line">            var rediscco = new <span class="function"><span class="title">RedisCacheClientOptions</span></span>() &#123; ConnectionMultiplexer = muxer &#125;;</span><br><span class="line">            var lockProvider = new CacheLockProvider(new RedisCacheClient(rediscco), new RedisMessageBus(new <span class="function"><span class="title">RedisMessageBusOptions</span></span>() &#123; Subscriber = rediscco.ConnectionMultiplexer.GetSubscriber() &#125;));</span><br><span class="line">            <span class="built_in">return</span> lockProvider;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>封装个helper<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">public class LockHelper</span><br><span class="line">   &#123;</span><br><span class="line">       private <span class="built_in">readonly</span> ILockProvider _lockProvider;</span><br><span class="line"></span><br><span class="line">       public LockHelper(ILockProvider lockProvider)</span><br><span class="line">       &#123;</span><br><span class="line">           _lockProvider = lockProvider;</span><br><span class="line">       &#125;</span><br><span class="line">       public  async Task&lt;ILock&gt; AcquireAsync(string name,</span><br><span class="line">           TimeSpan? lockTimeout = null,</span><br><span class="line">           CancellationToken cancellationToken = default(CancellationToken),</span><br><span class="line">           bool continueOnCapturedContext = <span class="literal">false</span>)</span><br><span class="line">       &#123;</span><br><span class="line">           var @lock = await _lockProvider.AcquireAsync(name, lockTimeout, cancellationToken)</span><br><span class="line">               .ConfigureAwait(continueOnCapturedContext);</span><br><span class="line">           <span class="built_in">return</span> @lock;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       public  Task&lt;bool&gt; IsLockedAsync(string name)</span><br><span class="line">       &#123;</span><br><span class="line">           <span class="built_in">return</span> _lockProvider.IsLockedAsync(name);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       public  Task ReleaseAsync(string name)</span><br><span class="line">       &#123;</span><br><span class="line">           <span class="built_in">return</span> _lockProvider.ReleaseAsync(name);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       public  Task RenewAsync(string name, TimeSpan? lockExtension = null)</span><br><span class="line">       &#123;</span><br><span class="line">           <span class="built_in">return</span> _lockProvider.RenewAsync(name, lockExtension);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/">在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 ccccccmd 的个人博客">ccccccmd</a></p>
+        <p><span>发布时间:</span>2018年06月09日 - 13时10分</p>
+        <p><span>最后更新:</span>2018年06月11日 - 16时55分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/" title="在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁">http://ccccccmd.rootu.cn/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://ccccccmd.rootu.cn/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/　　作者: ccccccmd" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2018/08/04/wordpress-via-docker/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          docker-compose 的方式安装 wordpress
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/04/20/abp-on-linux/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">abp core on centos</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#在asp-net-core-中使用CacheManager"><span class="toc-number">1.</span> <span class="toc-text">在asp.net core 中使用CacheManager</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用asp-net-core-的redis"><span class="toc-number">2.</span> <span class="toc-text">使用asp.net core 的redis</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在asp-net-core-中使用MassTransit"><span class="toc-number">3.</span> <span class="toc-text">在asp.net core 中使用MassTransit</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#aps-net-core-中使用-Foundatio-Redis分布式锁"><span class="toc-number">4.</span> <span class="toc-text">aps.net core 中使用 Foundatio.Redis分布式锁</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+
+
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2018/08/04/wordpress-via-docker/" title="上一篇: docker-compose 的方式安装 wordpress">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2018/04/20/abp-on-linux/" title="下一篇: abp core on centos">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/08/04/wordpress-via-docker/">docker-compose 的方式安装 wordpress</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/">在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/20/abp-on-linux/">abp core on centos</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/14/iis-net-core/">Asp.net core on IIS</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/07/await-and-async/">await和async</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/EFBulkInsert/">EF中的批量插入</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/mongodb/">mongodb</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/hangfire/">hangfire</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/distributed-lock/">分布式锁Foundatio.Lock</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/cqrs/">使用消息总线 masstransit</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/vue/">使用Vue.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/25/rabbitmq/">rabbitmq</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/24/ELK/">ELK</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Net Core On Linux/">.Net Core On Linux</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Hexo/">Hexo迁移</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/NetCore/">.Net Core 中间件</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/tyk/">tyk-gateway</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/04/04/Autofac-二/">Autofac(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/30/CLR/">CLR 总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-Others/">AWS 其他产品</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-RDS/">AWS RDS</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-S3/">AWS S3</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/13/autofac/">Autofac(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/16/java-review/">java-review</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/identityserver/">identityserver</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/abp-angular/">ABP and Angular</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/docker/">Docker</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/探索angular/">angular.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/表达式树-一/">表达式树(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/15/微信支付/">微信支付</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/MiniProfiler/">MiniProfiler</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/cdn-image-cqrs/">cdn-image-cqrs</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/webclient-timeout/">webclient-timeout</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/24/EF中的Attach和Entry/">EF中的Attach和Entry</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/16/ghost升级/">Ghost升级</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/15/Exceptionless-本地部署/">Exceptionless 本地部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/03/Quartz-net/">Quartz.net（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/01/mysqlfirst/">mysqlfirst</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/EF的One to Zero,One关系/">EF的One to Zero,One关系</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/17/phpfirst/">PHP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/03/eftrackingandstate/">EF的实体追踪/动态代理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/02/eflocaldata/">使用EF的本地数据</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/01/EntityFramework/">EF加载实体的三种模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/29/abp-begin/">ABP起步</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/19/ModelFirstInExistDb/">ModelFirstInExistDb</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/18/FluentAPI/">FluentAPI</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/11/Heox-博客搭建/">Hexo 博客搭建</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2018 ccccccmd
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> 
+				<p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 3;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

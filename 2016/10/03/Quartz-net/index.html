@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Quartz.net（一） | 403</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Quartz.net简介Quartz.net是一个很成熟的开源任务调度框架，开源地址在这里。现在在Nuget上的稳定版本是2.4.1. Quartz.net中定义了几个重要的角色： Scheduler 调度器他负责整个任务的调度，我们通过StdSchedulerFactory获得一个调度器。    ISchedulerFactory schedFact = new StdSchedulerFact">
+<meta name="keywords" content="Quartz.Net">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Quartz.net（一）">
+<meta property="og:url" content="http://ccccccmd.rootu.cn/2016/10/03/Quartz-net/index.html">
+<meta property="og:site_name" content="403">
+<meta property="og:description" content="Quartz.net简介Quartz.net是一个很成熟的开源任务调度框架，开源地址在这里。现在在Nuget上的稳定版本是2.4.1. Quartz.net中定义了几个重要的角色： Scheduler 调度器他负责整个任务的调度，我们通过StdSchedulerFactory获得一个调度器。    ISchedulerFactory schedFact = new StdSchedulerFact">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-05-29T09:45:53.303Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Quartz.net（一）">
+<meta name="twitter:description" content="Quartz.net简介Quartz.net是一个很成熟的开源任务调度框架，开源地址在这里。现在在Nuget上的稳定版本是2.4.1. Quartz.net中定义了几个重要的角色： Scheduler 调度器他负责整个任务的调度，我们通过StdSchedulerFactory获得一个调度器。    ISchedulerFactory schedFact = new StdSchedulerFact">
+  
+    <link rel="alternative" href="/atom.xml" title="403" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.png" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">ccccccmd</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Net-Core/" style="font-size: 15px;">.Net Core</a> <a href="/tags/ABP/" style="font-size: 15px;">ABP</a> <a href="/tags/Asp-net-Core/" style="font-size: 10px;">Asp.net Core</a> <a href="/tags/Autofac/" style="font-size: 15px;">Autofac</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C/" style="font-size: 10px;">C#</a> <a href="/tags/Cqrs/" style="font-size: 10px;">Cqrs</a> <a href="/tags/DDD/" style="font-size: 10px;">DDD</a> <a href="/tags/DataTracking/" style="font-size: 10px;">DataTracking</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/EF/" style="font-size: 20px;">EF</a> <a href="/tags/Event-Bus/" style="font-size: 10px;">Event Bus</a> <a href="/tags/Exceptionless/" style="font-size: 10px;">Exceptionless</a> <a href="/tags/Expression-Tree/" style="font-size: 10px;">Expression Tree</a> <a href="/tags/FluentAPI/" style="font-size: 10px;">FluentAPI</a> <a href="/tags/Ghost/" style="font-size: 10px;">Ghost</a> <a href="/tags/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/IIS/" style="font-size: 10px;">IIS</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Local-Data/" style="font-size: 10px;">Local Data</a> <a href="/tags/MediatR/" style="font-size: 10px;">MediatR</a> <a href="/tags/MiniProfiler/" style="font-size: 10px;">MiniProfiler</a> <a href="/tags/ModelFirst/" style="font-size: 10px;">ModelFirst</a> <a href="/tags/PHP入门/" style="font-size: 10px;">PHP入门</a> <a href="/tags/POCO/" style="font-size: 10px;">POCO</a> <a href="/tags/Proxy/" style="font-size: 10px;">Proxy</a> <a href="/tags/Quartz-Net/" style="font-size: 10px;">Quartz.Net</a> <a href="/tags/RDS/" style="font-size: 10px;">RDS</a> <a href="/tags/RDS-Others/" style="font-size: 10px;">RDS Others</a> <a href="/tags/S3/" style="font-size: 10px;">S3</a> <a href="/tags/TYK/" style="font-size: 10px;">TYK</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/angular-js/" style="font-size: 10px;">angular.js</a> <a href="/tags/async/" style="font-size: 10px;">async</a> <a href="/tags/cqrs/" style="font-size: 10px;">cqrs</a> <a href="/tags/distributed-lock/" style="font-size: 10px;">distributed lock</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/hangfire/" style="font-size: 10px;">hangfire</a> <a href="/tags/kibana/" style="font-size: 10px;">kibana</a> <a href="/tags/masstransit/" style="font-size: 10px;">masstransit</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/webclient/" style="font-size: 10px;">webclient</a> <a href="/tags/wordpress/" style="font-size: 10px;">wordpress</a> <a href="/tags/任务调度/" style="font-size: 10px;">任务调度</a> <a href="/tags/分布式锁/" style="font-size: 10px;">分布式锁</a> <a href="/tags/微信支付/" style="font-size: 10px;">微信支付</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://www.rootu.cn">Backup</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">ccccccmd</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.png" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">ccccccmd</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Quartz-net" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/10/03/Quartz-net/" class="article-date">
+      <time datetime="2016-10-03T14:21:22.000Z" itemprop="datePublished">2016-10-03</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Quartz.net（一）
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Net/">.Net</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Quartz-Net/">Quartz.Net</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="Quartz-net简介"><a href="#Quartz-net简介" class="headerlink" title="Quartz.net简介"></a>Quartz.net简介</h2><p>Quartz.net是一个很成熟的开源任务调度框架，<a href="‘https://github.com/quartznet/quartznet">开源地址在这里</a>。现在在Nuget上的稳定版本是<code>2.4.1</code>.</p>
+<p>Quartz.net中定义了几个重要的角色：</p>
+<h3 id="Scheduler-调度器"><a href="#Scheduler-调度器" class="headerlink" title="Scheduler 调度器"></a>Scheduler 调度器</h3><p>他负责整个任务的调度，我们通过<code>StdSchedulerFactory</code>获得一个调度器。</p>
+<blockquote>
+<p>  ISchedulerFactory schedFact = new StdSchedulerFactory();<br>IScheduler sched = schedFact.GetScheduler();</p>
+</blockquote>
+<p>调度器创建好了之后，可以添加，移除<code>Job</code> <code>Trigger</code>等，但是，只有他<code>start()</code>了之后，才会真的起作用。</p>
+<h3 id="Job"><a href="#Job" class="headerlink" title="Job"></a>Job</h3><p>Job就是我们具体要进行的任务，我们需要自己创建一个<code>class</code>实现<code>Ijob</code>接口里的<code>Execute</code>方法。</p>
+<h3 id="JobBuilder"><a href="#JobBuilder" class="headerlink" title="JobBuilder"></a>JobBuilder</h3><p>Quartz.net提供了一个<code>JobBuilder</code>的class帮我们把刚才定义好的的job <code>bulid</code>成<code>JobDetail</code>的实例，在此过程总，我可以指定job的组，标识等。</p>
+<blockquote>
+<p>var job = JobBuilder.Create<testjob>().WithIdentity(“testjob”,”group1”).Build() ;</testjob></p>
+</blockquote>
+<h3 id="Trigger"><a href="#Trigger" class="headerlink" title="Trigger"></a>Trigger</h3><p>定义了任务，然后就是要确定，任务在什么时间执行，执行多少次，这就是<code>Trigger</code>要做的事情。</p>
+<h3 id="TriggerBuilder"><a href="#TriggerBuilder" class="headerlink" title="TriggerBuilder"></a>TriggerBuilder</h3><p>我们用<code>TriggerBuilder</code>去创建触发器，里面提供了这几个方法：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">WithCalendarIntervalSchedule</span><br><span class="line">WithCronSchedule</span><br><span class="line">WithDailyTimeIntervalSchedule</span><br><span class="line">WithSimpleSchedule</span><br></pre></td></tr></table></figure></p>
+<p><code>WithCronSchedule</code>是最实用的，他允许我们用<code>Cron</code>的方式去定义任务的执行规则。<br><a id="more"></a></p>
+<h3 id="Common-Logging"><a href="#Common-Logging" class="headerlink" title="Common.Logging"></a>Common.Logging</h3><p>Quartz.net依赖了Common.Logging，可以方便的进行debug，在下面的demo中，我用Commmo.Logging+Nlog的方式，进行日志的记录。</p>
+<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><p>1.首先，先自定义自己的任务：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">public class TestJob : IJob</span><br><span class="line">&#123;</span><br><span class="line">    private ILog logger = LogManager.GetLogger(typeof(TestJob));</span><br><span class="line">    public void Execute(IJobExecutionContext context)</span><br><span class="line">    &#123;</span><br><span class="line">        try</span><br><span class="line">        &#123;</span><br><span class="line">            logger.Info(<span class="string">"Test_job_开始任务"</span>);</span><br><span class="line">            using (var db=new DbContext() )</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">for</span> (int i = 0; i &lt; 4; i++)</span><br><span class="line">                &#123;</span><br><span class="line">                    var car = new Cars()</span><br><span class="line">                    &#123;</span><br><span class="line">                         CreateTime =DateTime.Now , Name =<span class="string">"test_job_car_"</span>+i</span><br><span class="line">                    &#125;;</span><br><span class="line">                    db.Configuration.AutoDetectChangesEnabled = <span class="literal">false</span>;</span><br><span class="line">                    db.Carses.Add(car);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                db.SaveChanges();</span><br><span class="line">                db.Configuration.AutoDetectChangesEnabled = <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            logger.Info(<span class="string">"Test_job_任务完成"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        catch (Exception ex)</span><br><span class="line">        &#123;</span><br><span class="line">          </span><br><span class="line">           logger.Error(<span class="string">"Test_job_异常"</span>,ex);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.实现任务调度<br>每隔20秒执行一次：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public void QuartzTest()</span><br><span class="line">       &#123;</span><br><span class="line">           StdSchedulerFactory sf = new StdSchedulerFactory();</span><br><span class="line">           var sc = sf.GetScheduler();</span><br><span class="line">           var job = JobBuilder.Create&lt;TestJob&gt;().WithIdentity(<span class="string">"testjob"</span>, <span class="string">"group1"</span>).Build();</span><br><span class="line">           var trigger = TriggerBuilder.Create().WithIdentity(<span class="string">"trigger_test_job"</span>, <span class="string">"group1"</span>).WithSimpleSchedule(c =&gt; c.RepeatForever().WithIntervalInSeconds(20)).StartNow().Build();</span><br><span class="line">           sc.ScheduleJob(job, trigger);</span><br><span class="line">           sc.Start();</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure></p>
+<p>还可以指定这样的一个任务，在每小时的第<code>16</code>,<code>20</code>分钟的第<code>10,20,30,40,50</code>秒的时候执行任务：</p>
+<blockquote>
+<p>var trigger = TriggerBuilder.Create().WithIdentity(“trigger_test_job”, “group1”).WithCronSchedule(“10,20,30,40,50 16,20 <em> </em> * ? “).Build();</p>
+</blockquote>
+<h2 id="关于Common-Logging和Nlog的组合"><a href="#关于Common-Logging和Nlog的组合" class="headerlink" title="关于Common.Logging和Nlog的组合"></a>关于Common.Logging和Nlog的组合</h2><p>1.Nuget安装<code>NLog，Common.Logging.Nlog40(注意，这个版本是和Nlog的版本保持一致的)</code>。</p>
+<p>2.最重要的是配置文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configSections&gt;</span><br><span class="line">  &lt;sectionGroup name=<span class="string">"common"</span>&gt;</span><br><span class="line">    &lt;section name=<span class="string">"logging"</span> <span class="built_in">type</span>=<span class="string">"Common.Logging.ConfigurationSectionHandler, Common.Logging"</span> /&gt;</span><br><span class="line">  &lt;/sectionGroup&gt;</span><br><span class="line">  &lt;section name=<span class="string">"nlog"</span> <span class="built_in">type</span>=<span class="string">"NLog.Config.ConfigSectionHandler, NLog"</span> /&gt;</span><br><span class="line">&lt;/configSections&gt;</span><br></pre></td></tr></table></figure></p>
+<p>指定log由Nlog处理<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;common&gt;</span><br><span class="line">  &lt;logging&gt;</span><br><span class="line">    &lt;factoryAdapter <span class="built_in">type</span>=<span class="string">"Common.Logging.NLog.NLogLoggerFactoryAdapter, Common.Logging.NLog40"</span>&gt;</span><br><span class="line">      &lt;arg key=<span class="string">"configType"</span> value=<span class="string">"INLINE"</span> /&gt;</span><br><span class="line">    &lt;/factoryAdapter&gt;</span><br><span class="line">  &lt;/logging&gt;</span><br><span class="line">&lt;/common&gt;</span><br></pre></td></tr></table></figure></p>
+<p>Nlog的节点配置<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;nlog xmlns=<span class="string">"http://www.nlog-project.org/schemas/NLog.xsd"</span> xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span>&gt;</span><br><span class="line">    &lt;targets&gt;</span><br><span class="line">      &lt;target name=<span class="string">"logfile"</span> xsi:<span class="built_in">type</span>=<span class="string">"file"</span> filename=<span class="string">"e:\ccccccmd.txt"</span> layout=<span class="string">"<span class="variable">$&#123;date:format=yyyy/MM/dd HH:mm:ss&#125;</span> <span class="variable">$&#123;message&#125;</span>"</span> /&gt;</span><br><span class="line">    &lt;/targets&gt;</span><br><span class="line">    &lt;rules&gt;</span><br><span class="line">      &lt;logger name=<span class="string">"*"</span> minlevel=<span class="string">"Trace"</span> writeTo=<span class="string">"logfile"</span> /&gt;</span><br><span class="line">    &lt;/rules&gt;</span><br><span class="line">  &lt;/nlog&gt;</span><br></pre></td></tr></table></figure></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://github.com/net-commons/common-logging" target="_blank" rel="noopener">common.logging</a></li>
+<li><a href="https://github.com/NLog/NLog" target="_blank" rel="noopener">NLog</a></li>
+<li><a href="https://github.com/quartznet/quartznet" target="_blank" rel="noopener">quartznet</a></li>
+<li><a href="cnblog.com">cnblog前辈文章</a></li>
+<li><a href="http://git.oschina.net/chejiangyi/Dyd.BaseService.TaskManager" target="_blank" rel="noopener">车大开源的任务调度框架</a></li>
+</ul>
+
+      
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2016/10/03/Quartz-net/">Quartz.net（一）</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 ccccccmd 的个人博客">ccccccmd</a></p>
+        <p><span>发布时间:</span>2016年10月03日 - 22时21分</p>
+        <p><span>最后更新:</span>2017年05月29日 - 17时45分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2016/10/03/Quartz-net/" title="Quartz.net（一）">http://ccccccmd.rootu.cn/2016/10/03/Quartz-net/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://ccccccmd.rootu.cn/2016/10/03/Quartz-net/　　作者: ccccccmd" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2016/10/15/Exceptionless-本地部署/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Exceptionless 本地部署
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/08/01/mysqlfirst/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">mysqlfirst</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Quartz-net简介"><span class="toc-number">1.</span> <span class="toc-text">Quartz.net简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Scheduler-调度器"><span class="toc-number">1.1.</span> <span class="toc-text">Scheduler 调度器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Job"><span class="toc-number">1.2.</span> <span class="toc-text">Job</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JobBuilder"><span class="toc-number">1.3.</span> <span class="toc-text">JobBuilder</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Trigger"><span class="toc-number">1.4.</span> <span class="toc-text">Trigger</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TriggerBuilder"><span class="toc-number">1.5.</span> <span class="toc-text">TriggerBuilder</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Common-Logging"><span class="toc-number">1.6.</span> <span class="toc-text">Common.Logging</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Demo"><span class="toc-number">2.</span> <span class="toc-text">Demo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关于Common-Logging和Nlog的组合"><span class="toc-number">3.</span> <span class="toc-text">关于Common.Logging和Nlog的组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+
+
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/10/15/Exceptionless-本地部署/" title="上一篇: Exceptionless 本地部署">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2016/08/01/mysqlfirst/" title="下一篇: mysqlfirst">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/08/04/wordpress-via-docker/">docker-compose 的方式安装 wordpress</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/">在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/20/abp-on-linux/">abp core on centos</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/14/iis-net-core/">Asp.net core on IIS</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/07/await-and-async/">await和async</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/EFBulkInsert/">EF中的批量插入</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/mongodb/">mongodb</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/hangfire/">hangfire</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/distributed-lock/">分布式锁Foundatio.Lock</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/cqrs/">使用消息总线 masstransit</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/vue/">使用Vue.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/25/rabbitmq/">rabbitmq</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/24/ELK/">ELK</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Net Core On Linux/">.Net Core On Linux</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Hexo/">Hexo迁移</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/NetCore/">.Net Core 中间件</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/tyk/">tyk-gateway</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/04/04/Autofac-二/">Autofac(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/30/CLR/">CLR 总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-Others/">AWS 其他产品</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-RDS/">AWS RDS</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-S3/">AWS S3</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/13/autofac/">Autofac(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/16/java-review/">java-review</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/identityserver/">identityserver</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/abp-angular/">ABP and Angular</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/docker/">Docker</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/探索angular/">angular.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/表达式树-一/">表达式树(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/15/微信支付/">微信支付</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/MiniProfiler/">MiniProfiler</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/cdn-image-cqrs/">cdn-image-cqrs</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/webclient-timeout/">webclient-timeout</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/24/EF中的Attach和Entry/">EF中的Attach和Entry</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/16/ghost升级/">Ghost升级</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/15/Exceptionless-本地部署/">Exceptionless 本地部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/03/Quartz-net/">Quartz.net（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/01/mysqlfirst/">mysqlfirst</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/EF的One to Zero,One关系/">EF的One to Zero,One关系</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/17/phpfirst/">PHP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/03/eftrackingandstate/">EF的实体追踪/动态代理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/02/eflocaldata/">使用EF的本地数据</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/01/EntityFramework/">EF加载实体的三种模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/29/abp-begin/">ABP起步</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/19/ModelFirstInExistDb/">ModelFirstInExistDb</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/18/FluentAPI/">FluentAPI</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/11/Heox-博客搭建/">Hexo 博客搭建</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2018 ccccccmd
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> 
+				<p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 3;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

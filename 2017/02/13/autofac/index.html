@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Autofac(一) | 403</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="什么是注册Autofac 通过创建一个 ContainerBuilder 来注册你的组件。它的目的是告诉你的组件要实现那个服务。 ContainerBuilder里有很多 Register方法来完成。 123456789101112// 创建注册组件/服务的builder.var builder = new ContainerBuilder();// 注册暴露指定接口的类型builder.Regi">
+<meta name="keywords" content="Autofac">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Autofac(一)">
+<meta property="og:url" content="http://ccccccmd.rootu.cn/2017/02/13/autofac/index.html">
+<meta property="og:site_name" content="403">
+<meta property="og:description" content="什么是注册Autofac 通过创建一个 ContainerBuilder 来注册你的组件。它的目的是告诉你的组件要实现那个服务。 ContainerBuilder里有很多 Register方法来完成。 123456789101112// 创建注册组件/服务的builder.var builder = new ContainerBuilder();// 注册暴露指定接口的类型builder.Regi">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-05-29T09:45:53.304Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Autofac(一)">
+<meta name="twitter:description" content="什么是注册Autofac 通过创建一个 ContainerBuilder 来注册你的组件。它的目的是告诉你的组件要实现那个服务。 ContainerBuilder里有很多 Register方法来完成。 123456789101112// 创建注册组件/服务的builder.var builder = new ContainerBuilder();// 注册暴露指定接口的类型builder.Regi">
+  
+    <link rel="alternative" href="/atom.xml" title="403" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.png" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">ccccccmd</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Net-Core/" style="font-size: 15px;">.Net Core</a> <a href="/tags/ABP/" style="font-size: 15px;">ABP</a> <a href="/tags/Asp-net-Core/" style="font-size: 10px;">Asp.net Core</a> <a href="/tags/Autofac/" style="font-size: 15px;">Autofac</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C/" style="font-size: 10px;">C#</a> <a href="/tags/Cqrs/" style="font-size: 10px;">Cqrs</a> <a href="/tags/DDD/" style="font-size: 10px;">DDD</a> <a href="/tags/DataTracking/" style="font-size: 10px;">DataTracking</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/EF/" style="font-size: 20px;">EF</a> <a href="/tags/Event-Bus/" style="font-size: 10px;">Event Bus</a> <a href="/tags/Exceptionless/" style="font-size: 10px;">Exceptionless</a> <a href="/tags/Expression-Tree/" style="font-size: 10px;">Expression Tree</a> <a href="/tags/FluentAPI/" style="font-size: 10px;">FluentAPI</a> <a href="/tags/Ghost/" style="font-size: 10px;">Ghost</a> <a href="/tags/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/IIS/" style="font-size: 10px;">IIS</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Local-Data/" style="font-size: 10px;">Local Data</a> <a href="/tags/MediatR/" style="font-size: 10px;">MediatR</a> <a href="/tags/MiniProfiler/" style="font-size: 10px;">MiniProfiler</a> <a href="/tags/ModelFirst/" style="font-size: 10px;">ModelFirst</a> <a href="/tags/PHP入门/" style="font-size: 10px;">PHP入门</a> <a href="/tags/POCO/" style="font-size: 10px;">POCO</a> <a href="/tags/Proxy/" style="font-size: 10px;">Proxy</a> <a href="/tags/Quartz-Net/" style="font-size: 10px;">Quartz.Net</a> <a href="/tags/RDS/" style="font-size: 10px;">RDS</a> <a href="/tags/RDS-Others/" style="font-size: 10px;">RDS Others</a> <a href="/tags/S3/" style="font-size: 10px;">S3</a> <a href="/tags/TYK/" style="font-size: 10px;">TYK</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/angular-js/" style="font-size: 10px;">angular.js</a> <a href="/tags/async/" style="font-size: 10px;">async</a> <a href="/tags/cqrs/" style="font-size: 10px;">cqrs</a> <a href="/tags/distributed-lock/" style="font-size: 10px;">distributed lock</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/hangfire/" style="font-size: 10px;">hangfire</a> <a href="/tags/kibana/" style="font-size: 10px;">kibana</a> <a href="/tags/masstransit/" style="font-size: 10px;">masstransit</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/webclient/" style="font-size: 10px;">webclient</a> <a href="/tags/wordpress/" style="font-size: 10px;">wordpress</a> <a href="/tags/任务调度/" style="font-size: 10px;">任务调度</a> <a href="/tags/分布式锁/" style="font-size: 10px;">分布式锁</a> <a href="/tags/微信支付/" style="font-size: 10px;">微信支付</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://www.rootu.cn">Backup</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">ccccccmd</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.png" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">ccccccmd</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-autofac" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/02/13/autofac/" class="article-date">
+      <time datetime="2017-02-13T06:02:45.000Z" itemprop="datePublished">2017-02-13</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Autofac(一)
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Autofac/">Autofac</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Autofac/">Autofac</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="什么是注册"><a href="#什么是注册" class="headerlink" title="什么是注册"></a>什么是注册</h2><p>Autofac 通过创建一个 <code>ContainerBuilder</code> 来注册你的组件。它的目的是告诉你的组件要实现那个服务。</p>
+<p><code>ContainerBuilder</code>里有很多 <code>Register</code>方法来完成。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// 创建注册组件/服务的builder.</span><br><span class="line">var builder = new ContainerBuilder();</span><br><span class="line"></span><br><span class="line">// 注册暴露指定接口的类型</span><br><span class="line">builder.RegisterType&lt;ConsoleLogger&gt;().As&lt;ILogger&gt;();</span><br><span class="line"></span><br><span class="line">// 注册创建的对象实例</span><br><span class="line">var output = new StringWriter();</span><br><span class="line">builder.RegisterInstance(output).As&lt;TextWriter&gt;();</span><br><span class="line"></span><br><span class="line">// 注册创建对象的匿名函数</span><br><span class="line">builder.Register(c =&gt; new ConfigReader(<span class="string">"mysection"</span>)).As&lt;IConfigReader&gt;();</span><br></pre></td></tr></table></figure>
+<h2 id="反射组件"><a href="#反射组件" class="headerlink" title="反射组件"></a>反射组件</h2><ul>
+<li>通过类型注册：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var builder = new ContainerBuilder();</span><br><span class="line">builder.RegisterType&lt;ConsoleLogger&gt;();</span><br><span class="line">builder.RegisterType(typeof(ConfigReader));</span><br></pre></td></tr></table></figure>
+<p>Autofac automatically uses the constructor for your class with the most parameters that are able to be obtained from the container.</p>
+<ul>
+<li>指定构造函数</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">builder.RegisterType&lt;MyComponent&gt;()</span><br><span class="line">       .UsingConstructor(typeof(ILogger), typeof(IConfigReader));</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<ul>
+<li>实例组件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var output = new StringWriter();</span><br><span class="line">builder.RegisterInstance(output).As&lt;TextWriter&gt;();</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Lambda表达式组件</li>
+</ul>
+<p>适合复杂的注册逻辑</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">builder.Register(c =&gt; new A(c.Resolve&lt;B&gt;()));</span><br></pre></td></tr></table></figure>
+<ul>
+<li>复杂的参数</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">builder.Register(c =&gt; new UserSession(DateTime.Now.AddMinutes(25)));</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>属性注入</p>
+<p>如果是表达式组件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">builder.Register(c =&gt; new A &#123; B = c.Resolve&lt;B&gt;() &#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>为了支持循环依赖检测，可以用下面这种更灵活的方式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">builder.Register(c =&gt; new A()).OnActivated(e =&gt; e.Instance.B = e.Context.Resolve&lt;B&gt;());</span><br></pre></td></tr></table></figure>
+<p>其余情况：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//If the component is a reflection component, use the PropertiesAutowired() modifier to inject properties:</span><br><span class="line"></span><br><span class="line">builder.RegisterType&lt;A&gt;().PropertiesAutowired();</span><br><span class="line"></span><br><span class="line">//If you have one specific property and value to wire up, you can use the WithProperty() modifier:</span><br><span class="line"></span><br><span class="line">builder.RegisterType&lt;A&gt;().WithProperty(<span class="string">"PropertyName"</span>, propertyValue);</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">builder.Register&lt;CreditCard&gt;(</span><br><span class="line">  (c, p) =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">      var accountId = p.Named&lt;string&gt;(<span class="string">"accountId"</span>);</span><br><span class="line">      <span class="keyword">if</span> (accountId.StartsWith(<span class="string">"9"</span>))</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">return</span> new GoldCard(accountId);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">return</span> new StandardCard(accountId);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">//使用</span><br><span class="line">    var card = container.Resolve&lt;CreditCard&gt;(new NamedParameter(<span class="string">"accountId"</span>, <span class="string">"12345"</span>));</span><br></pre></td></tr></table></figure>
+<ul>
+<li>方法注入</li>
+</ul>
+<p>使用方法给某个组件设置注入值的最简单方法就是使用Lambda表达式组件并且在注册时调用这个方法：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">builder.Register(c =&gt; &#123;</span><br><span class="line">  var result = new MyObjectType();</span><br><span class="line">  var dep = c.Resolve&lt;TheDependency&gt;();</span><br><span class="line">  result.SetTheDependency(dep);</span><br><span class="line">  <span class="built_in">return</span> result;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>如果不能使用Lambda注册的话，可以添加一个激活事件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">builder</span><br><span class="line">  .Register&lt;MyObjectType&gt;()</span><br><span class="line">  .OnActivating(e =&gt; &#123;</span><br><span class="line">    var dep = e.Context.Resolve&lt;TheDependency&gt;();</span><br><span class="line">    e.Instance.SetTheDependency(dep);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>泛型组件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">builder.RegisterGeneric(typeof(NHibernateRepository&lt;&gt;))</span><br><span class="line">       .As(typeof(IRepository&lt;&gt;))</span><br><span class="line">       .InstancePerLifetimeScope();</span><br><span class="line"></span><br><span class="line">// Autofac will <span class="built_in">return</span> an NHibernateRepository&lt;Task&gt;</span><br><span class="line">var tasks = container.Resolve&lt;IRepository&lt;Task&gt;&gt;();</span><br><span class="line">```       </span><br><span class="line"></span><br><span class="line"><span class="comment">## Services vs. Components</span></span><br><span class="line"></span><br><span class="line">你注册了一个组件，就要告诉autofac，这个组件是给谁实现的。默认是给自己</span><br><span class="line"></span><br><span class="line">```bash</span><br><span class="line">// This exposes the service <span class="string">"CallLogger"</span></span><br><span class="line">builder.RegisterType&lt;CallLogger&gt;();</span><br><span class="line"></span><br><span class="line">// This will work because the component</span><br><span class="line">// exposes the <span class="built_in">type</span> by default:</span><br><span class="line"></span><br><span class="line">scope.Resolve&lt;CallLogger&gt;();</span><br><span class="line"></span><br><span class="line">// This will NOT work because we didn<span class="string">'t</span></span><br><span class="line"><span class="string">// tell the registration to also expose</span></span><br><span class="line"><span class="string">// the ILogger interface on CallLogger:</span></span><br><span class="line"><span class="string">scope.Resolve&lt;ILogger&gt;();</span></span><br></pre></td></tr></table></figure>
+<p>我们可以将这个组件暴露给多个服务。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">builder.RegisterType&lt;CallLogger&gt;()</span><br><span class="line">       .As&lt;ILogger&gt;()</span><br><span class="line">       .As&lt;ICallInterceptor&gt;();</span><br></pre></td></tr></table></figure></p>
+<p>如果你的组件暴露给了一个服务，那么默认的服务就被覆盖了</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// These will both work because we exposed</span><br><span class="line">// the appropriate services <span class="keyword">in</span> the registration:</span><br><span class="line">scope.Resolve&lt;ILogger&gt;();</span><br><span class="line">scope.Resolve&lt;ICallInterceptor&gt;();</span><br><span class="line"></span><br><span class="line">// This WON<span class="string">'T WORK anymore because we specified</span></span><br><span class="line"><span class="string">// service overrides on the component:</span></span><br><span class="line"><span class="string">scope.Resolve&lt;CallLogger&gt;();</span></span><br></pre></td></tr></table></figure>
+<p>也能用默认的服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">builder.RegisterType&lt;CallLogger&gt;()</span><br><span class="line">       .AsSelf()</span><br><span class="line">       .As&lt;ILogger&gt;()</span><br><span class="line">       .As&lt;ICallInterceptor&gt;();</span><br><span class="line">Now all of these will work:</span><br><span class="line"></span><br><span class="line">// These will all work because we exposed</span><br><span class="line">// the appropriate services <span class="keyword">in</span> the registration:</span><br><span class="line">scope.Resolve&lt;ILogger&gt;();</span><br><span class="line">scope.Resolve&lt;ICallInterceptor&gt;();</span><br><span class="line">scope.Resolve&lt;CallLogger&gt;();</span><br></pre></td></tr></table></figure>
+<ul>
+<li>默认注册</li>
+</ul>
+<p>如果多个组件暴露了统一服务，那个，最后一个作为该服务的默认实现</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">builder.Register&lt;ConsoleLogger&gt;().As&lt;ILogger&gt;();</span><br><span class="line">builder.Register&lt;FileLogger&gt;().As&lt;ILogger&gt;();</span><br></pre></td></tr></table></figure>
+<p>使用PreserveExistingDefaults()可以改变：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">builder.Register&lt;ConsoleLogger&gt;().As&lt;ILogger&gt;();</span><br><span class="line">builder.Register&lt;FileLogger&gt;().As&lt;ILogger&gt;().PreserveExistingDefaults();</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>带条件注册</li>
+</ul>
+<p>上面提到的集中注册方式已经可以满足大部分的注册情况。但是针对一些特定情况的条件注册，autofac提供了两个扩展方法：</p>
+<p><code>OnlyIf()</code> - Provide a lambda that uses an IComponentRegistry to determine if a registration should happen.</p>
+<p><code>IfNotRegistered()</code>- Shortcut to stop a registration from happening if some other service is already registered.</p>
+<p>这两个扩展都在<code>ContainerBuilder.Build()</code>时候执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">var builder = new ContainerBuilder();</span><br><span class="line"></span><br><span class="line">// Only ServiceA will be registered.</span><br><span class="line">// Note the IfNotRegistered takes the SERVICE TYPE to</span><br><span class="line">// check <span class="keyword">for</span> (the As&lt;T&gt;), NOT the COMPONENT TYPE</span><br><span class="line">// (the RegisterType&lt;T&gt;).</span><br><span class="line">builder.RegisterType&lt;ServiceA&gt;()</span><br><span class="line">       .As&lt;IService&gt;();</span><br><span class="line">builder.RegisterType&lt;ServiceB&gt;()</span><br><span class="line">       .As&lt;IService&gt;()</span><br><span class="line">       .IfNotRegistered(typeof(IService));</span><br><span class="line"></span><br><span class="line">// HandlerA WILL be registered - it<span class="string">'s running</span></span><br><span class="line"><span class="string">// BEFORE HandlerB has a chance to be registered</span></span><br><span class="line"><span class="string">// so the IfNotRegistered check won'</span>t find it.</span><br><span class="line">//</span><br><span class="line">// HandlerC will NOT be registered because it</span><br><span class="line">// runs AFTER HandlerB. Note it can check <span class="keyword">for</span></span><br><span class="line">// the <span class="built_in">type</span> <span class="string">"HandlerB"</span> because HandlerB registered</span><br><span class="line">// AsSelf() not just As&lt;IHandler&gt;(). Again,</span><br><span class="line">// IfNotRegistered can only check <span class="keyword">for</span> <span class="string">"As"</span></span><br><span class="line">// types.</span><br><span class="line">builder.RegisterType&lt;HandlerA&gt;()</span><br><span class="line">       .AsSelf()</span><br><span class="line">       .As&lt;IHandler&gt;()</span><br><span class="line">       .IfNotRegistered(typeof(HandlerB));</span><br><span class="line">builder.RegisterType&lt;HandlerB&gt;()</span><br><span class="line">       .AsSelf()</span><br><span class="line">       .As&lt;IHandler&gt;();</span><br><span class="line">builder.RegisterType&lt;HandlerC&gt;()</span><br><span class="line">       .AsSelf()</span><br><span class="line">       .As&lt;IHandler&gt;()</span><br><span class="line">       .IfNotRegistered(typeof(HandlerB));</span><br><span class="line"></span><br><span class="line">// Manager will be registered because both an IService</span><br><span class="line">// and HandlerB are registered. The OnlyIf predicate</span><br><span class="line">// can allow a lot more flexibility.</span><br><span class="line">builder.RegisterType&lt;Manager&gt;()</span><br><span class="line">       .As&lt;IManager&gt;()</span><br><span class="line">       .OnlyIf(reg =&gt;</span><br><span class="line">         reg.IsRegistered(new TypedService(typeof(IService))) &amp;&amp;</span><br><span class="line">         reg.IsRegistered(new TypedService(typeof(HandlerB))));</span><br><span class="line"></span><br><span class="line">// This is when the conditionals actually run. Again,</span><br><span class="line">// they run <span class="keyword">in</span> the order the registrations were added</span><br><span class="line">// to the ContainerBuilder.</span><br><span class="line">var container = builder.Build();</span><br></pre></td></tr></table></figure>
+<h2 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h2><p><a href="http://autofac.readthedocs.io/en/latest/lifetime/disposal.html" target="_blank" rel="noopener">disposal</a></p>
+
+      
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/02/13/autofac/">Autofac(一)</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 ccccccmd 的个人博客">ccccccmd</a></p>
+        <p><span>发布时间:</span>2017年02月13日 - 14时02分</p>
+        <p><span>最后更新:</span>2017年05月29日 - 17时45分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/02/13/autofac/" title="Autofac(一)">http://ccccccmd.rootu.cn/2017/02/13/autofac/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://ccccccmd.rootu.cn/2017/02/13/autofac/　　作者: ccccccmd" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2017/02/21/AWS-S3/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          AWS S3
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/01/16/java-review/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">java-review</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是注册"><span class="toc-number">1.</span> <span class="toc-text">什么是注册</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#反射组件"><span class="toc-number">2.</span> <span class="toc-text">反射组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#生命周期"><span class="toc-number">3.</span> <span class="toc-text">生命周期</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+
+
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2017/02/21/AWS-S3/" title="上一篇: AWS S3">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2017/01/16/java-review/" title="下一篇: java-review">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/08/04/wordpress-via-docker/">docker-compose 的方式安装 wordpress</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/">在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/20/abp-on-linux/">abp core on centos</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/14/iis-net-core/">Asp.net core on IIS</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/07/await-and-async/">await和async</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/EFBulkInsert/">EF中的批量插入</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/mongodb/">mongodb</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/hangfire/">hangfire</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/distributed-lock/">分布式锁Foundatio.Lock</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/cqrs/">使用消息总线 masstransit</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/vue/">使用Vue.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/25/rabbitmq/">rabbitmq</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/24/ELK/">ELK</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Net Core On Linux/">.Net Core On Linux</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Hexo/">Hexo迁移</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/NetCore/">.Net Core 中间件</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/tyk/">tyk-gateway</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/04/04/Autofac-二/">Autofac(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/30/CLR/">CLR 总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-Others/">AWS 其他产品</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-RDS/">AWS RDS</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-S3/">AWS S3</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/13/autofac/">Autofac(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/16/java-review/">java-review</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/identityserver/">identityserver</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/abp-angular/">ABP and Angular</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/docker/">Docker</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/探索angular/">angular.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/表达式树-一/">表达式树(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/15/微信支付/">微信支付</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/MiniProfiler/">MiniProfiler</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/cdn-image-cqrs/">cdn-image-cqrs</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/webclient-timeout/">webclient-timeout</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/24/EF中的Attach和Entry/">EF中的Attach和Entry</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/16/ghost升级/">Ghost升级</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/15/Exceptionless-本地部署/">Exceptionless 本地部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/03/Quartz-net/">Quartz.net（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/01/mysqlfirst/">mysqlfirst</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/EF的One to Zero,One关系/">EF的One to Zero,One关系</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/17/phpfirst/">PHP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/03/eftrackingandstate/">EF的实体追踪/动态代理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/02/eflocaldata/">使用EF的本地数据</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/01/EntityFramework/">EF加载实体的三种模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/29/abp-begin/">ABP起步</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/19/ModelFirstInExistDb/">ModelFirstInExistDb</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/18/FluentAPI/">FluentAPI</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/11/Heox-博客搭建/">Hexo 博客搭建</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2018 ccccccmd
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> 
+				<p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 3;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

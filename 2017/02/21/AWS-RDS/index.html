@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>AWS RDS | 403</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="RDS 简介Amazon Relational Database Service (Amazon RDS) 让您能够在云中轻松设置、操作和扩展关系数据库。它在管理耗时的数据库管理任务的同时，可提供经济实用的可调容量，使您能够腾出时间专注于应用程序和业务。Amazon RDS 提供六种常用的数据库引擎供您选择，即 Amazon Aurora、PostgreSQL、MySQL、MariaDB、Orac">
+<meta name="keywords" content="RDS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS RDS">
+<meta property="og:url" content="http://ccccccmd.rootu.cn/2017/02/21/AWS-RDS/index.html">
+<meta property="og:site_name" content="403">
+<meta property="og:description" content="RDS 简介Amazon Relational Database Service (Amazon RDS) 让您能够在云中轻松设置、操作和扩展关系数据库。它在管理耗时的数据库管理任务的同时，可提供经济实用的可调容量，使您能够腾出时间专注于应用程序和业务。Amazon RDS 提供六种常用的数据库引擎供您选择，即 Amazon Aurora、PostgreSQL、MySQL、MariaDB、Orac">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-05-29T09:45:53.296Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AWS RDS">
+<meta name="twitter:description" content="RDS 简介Amazon Relational Database Service (Amazon RDS) 让您能够在云中轻松设置、操作和扩展关系数据库。它在管理耗时的数据库管理任务的同时，可提供经济实用的可调容量，使您能够腾出时间专注于应用程序和业务。Amazon RDS 提供六种常用的数据库引擎供您选择，即 Amazon Aurora、PostgreSQL、MySQL、MariaDB、Orac">
+  
+    <link rel="alternative" href="/atom.xml" title="403" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.png" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">ccccccmd</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Net-Core/" style="font-size: 15px;">.Net Core</a> <a href="/tags/ABP/" style="font-size: 15px;">ABP</a> <a href="/tags/Asp-net-Core/" style="font-size: 10px;">Asp.net Core</a> <a href="/tags/Autofac/" style="font-size: 15px;">Autofac</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C/" style="font-size: 10px;">C#</a> <a href="/tags/Cqrs/" style="font-size: 10px;">Cqrs</a> <a href="/tags/DDD/" style="font-size: 10px;">DDD</a> <a href="/tags/DataTracking/" style="font-size: 10px;">DataTracking</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/EF/" style="font-size: 20px;">EF</a> <a href="/tags/Event-Bus/" style="font-size: 10px;">Event Bus</a> <a href="/tags/Exceptionless/" style="font-size: 10px;">Exceptionless</a> <a href="/tags/Expression-Tree/" style="font-size: 10px;">Expression Tree</a> <a href="/tags/FluentAPI/" style="font-size: 10px;">FluentAPI</a> <a href="/tags/Ghost/" style="font-size: 10px;">Ghost</a> <a href="/tags/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/IIS/" style="font-size: 10px;">IIS</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Local-Data/" style="font-size: 10px;">Local Data</a> <a href="/tags/MediatR/" style="font-size: 10px;">MediatR</a> <a href="/tags/MiniProfiler/" style="font-size: 10px;">MiniProfiler</a> <a href="/tags/ModelFirst/" style="font-size: 10px;">ModelFirst</a> <a href="/tags/PHP入门/" style="font-size: 10px;">PHP入门</a> <a href="/tags/POCO/" style="font-size: 10px;">POCO</a> <a href="/tags/Proxy/" style="font-size: 10px;">Proxy</a> <a href="/tags/Quartz-Net/" style="font-size: 10px;">Quartz.Net</a> <a href="/tags/RDS/" style="font-size: 10px;">RDS</a> <a href="/tags/RDS-Others/" style="font-size: 10px;">RDS Others</a> <a href="/tags/S3/" style="font-size: 10px;">S3</a> <a href="/tags/TYK/" style="font-size: 10px;">TYK</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/angular-js/" style="font-size: 10px;">angular.js</a> <a href="/tags/async/" style="font-size: 10px;">async</a> <a href="/tags/cqrs/" style="font-size: 10px;">cqrs</a> <a href="/tags/distributed-lock/" style="font-size: 10px;">distributed lock</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/hangfire/" style="font-size: 10px;">hangfire</a> <a href="/tags/kibana/" style="font-size: 10px;">kibana</a> <a href="/tags/masstransit/" style="font-size: 10px;">masstransit</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/webclient/" style="font-size: 10px;">webclient</a> <a href="/tags/wordpress/" style="font-size: 10px;">wordpress</a> <a href="/tags/任务调度/" style="font-size: 10px;">任务调度</a> <a href="/tags/分布式锁/" style="font-size: 10px;">分布式锁</a> <a href="/tags/微信支付/" style="font-size: 10px;">微信支付</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://www.rootu.cn">Backup</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">ccccccmd</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.png" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">ccccccmd</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-AWS-RDS" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/02/21/AWS-RDS/" class="article-date">
+      <time datetime="2017-02-21T15:16:28.000Z" itemprop="datePublished">2017-02-21</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      AWS RDS
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/AWS/">AWS</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RDS/">RDS</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="RDS"><a href="#RDS" class="headerlink" title="RDS"></a>RDS</h2><ul>
+<li><a href="https://aws.amazon.com/cn/rds/getting-started/" target="_blank" rel="noopener">简介</a><br>Amazon Relational Database Service (Amazon RDS) 让您能够在云中轻松设置、操作和扩展关系数据库。它在管理耗时的数据库管理任务的同时，可提供经济实用的可调容量，使您能够腾出时间专注于应用程序和业务。Amazon RDS 提供六种常用的数据库引擎供您选择，即 Amazon Aurora、PostgreSQL、MySQL、MariaDB、Oracle 和 Microsoft SQL Server。</li>
+</ul>
+<h2 id="Amazon-RDS-for-SQL-Server"><a href="#Amazon-RDS-for-SQL-Server" class="headerlink" title="Amazon RDS for SQL Server"></a>Amazon RDS for SQL Server</h2><p><a href="https://aws.amazon.com/cn/rds/sqlserver/" target="_blank" rel="noopener">https://aws.amazon.com/cn/rds/sqlserver/</a></p>
+<ul>
+<li>备份和灾难恢复(针对实例)</li>
+</ul>
+<p>自动备份 – Amazon RDS 的自动备份功能在默认情况下打开，实现数据库实例的时间点恢复。Amazon RDS 以 5 分钟为间隔备份您的数据库和事务日志，并且按您指定的保留期进行存储。这样，您就能够将数据库实例恢复到保留期内任何一秒钟的状态，最多可恢复到前五分钟的状态。自动备份保留期可配置为最长 35 天。</p>
+<p>数据库快照 – 数据库快照是用户启动的数据库实例备份。Amazon RDS 将存储这些完整数据库备份，直至您明确删除它们。您可以在需要时随时从数据库快照创建新数据库实例。</p>
+<p>适用于 Microsoft SQL Server 的 Amazon RDS 不支持将数据导入 msdb 数据库。</p>
+<a id="more"></a>
+<ul>
+<li>将数据库实例还原至指定时间<br>Amazon RDS 自动备份功能将自动为数据库实例创建存储卷快照，并备份整个数据库实例而不仅仅是单个数据库。</li>
+</ul>
+<blockquote>
+<p>从某个时间点进行还原时，Amazon RDS 使用的多种数据库引擎有一些特殊的注意事项。将 Oracle 数据库实例还原到某个时间点时，可指定不同的 Oracle 数据库引擎、许可模式和 DBName (SID) 供新数据库实例使用。将 SQL Server 数据库实例还原到某个时间点时，该实例中的<strong>每个数据库均还原</strong>到与实例中每个其他数据库相差 1 秒以内的时间点。对于实例内跨多个数据库的事务，还原时可能会发生不一致的情况。</p>
+</blockquote>
+<h2 id="价格"><a href="#价格" class="headerlink" title="价格"></a>价格</h2><p>亚马逊RDS计费分为两个主要的部分，一个是“实例费用”(CPU和内存)，另一个是“存储费用”(磁盘容量和IOPS)。这两类资源的费用，又细分为单可用区和多可用区，另外，还可以选择“按小时计费”、又或者是“包年计费”的方式购买，这些对价格都有很大影响。本文分多个部分细致介绍了亚马逊如何计算一个RDS实例的价格。<br><a href="https://aws.amazon.com/cn/rds/faqs/#20" target="_blank" rel="noopener">https://aws.amazon.com/cn/rds/faqs/#20</a><br><a href="https://aws.amazon.com/cn/rds/sqlserver/pricing/" target="_blank" rel="noopener">https://aws.amazon.com/cn/rds/sqlserver/pricing/</a></p>
+<h2 id="入门"><a href="#入门" class="headerlink" title="入门"></a>入门</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.html" target="_blank" rel="noopener">http://docs.aws.amazon.com/zh_cn/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.html</a></p>
+<h2 id="针对单独的数据库"><a href="#针对单独的数据库" class="headerlink" title="针对单独的数据库"></a>针对单独的数据库</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonRDS/latest/UserGuide/SQLServer.Procedural.Importing.html#SQLServer.Procedural.Importing.Native.Using.Restore" target="_blank" rel="noopener">DOC</a></p>
+<ul>
+<li>备份<br>调用 rds_backup_database 存储过程。<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exec</span> msdb.dbo.rds_backup_database </span><br><span class="line">        @source_db_name=<span class="string">'database_name'</span>, </span><br><span class="line">        @s3_arn_to_backup_to=<span class="string">'arn:aws:s3:::bucket_name/file_name_and_extension'</span>,</span><br><span class="line">        @overwrite_S3_backup_file=1;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>如果实例的选项组 是  <code>SQLSERVER_BACKUP_RESTORE</code> ， 上述命令应该可以执行成功；会返回一个任务ID的。</p>
+<ul>
+<li>取消任务</li>
+</ul>
+<p>要取消备份或还原任务，可调用 rds_cancel_task 存储过程。</p>
+<ul>
+<li>@task_id – 要取消的任务的 ID。可以通过调用 rds_task_status 获取任务 ID。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exec</span> msdb.dbo.rds_cancel_task @task_id=1234;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>还原</li>
+</ul>
+<p>要还原数据库，可调用 rds_restore_database 存储过程。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exec</span> msdb.dbo.rds_restore_database </span><br><span class="line">        @restore_db_name=<span class="string">'database_name'</span>, </span><br><span class="line">        @s3_arn_to_restore_from=<span class="string">'arn:aws:s3:::bucket_name/file_name_and_extension'</span>;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>跟踪任务的状态</li>
+</ul>
+<p>要跟踪备份和还原任务的状态，可调用 rds_task_status 存储过程。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exec</span> msdb.dbo.rds_task_status @db_name=<span class="string">'database_name'</span></span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>所以，要对数据库进行还原和备份，还要借助  <code>S3</code> 的。</li>
+</ul>
+<p><strong>TIPS</strong></p>
+<blockquote>
+<p>您无法将一个备份文件还原到已用于创建该备份文件的同一数据库实例。而是应将该备份文件还原到新的数据库实例。对数据库进行重命名不是消除此限制的办法。</p>
+</blockquote>
+<blockquote>
+<p>您无法将同一备份文件多次还原到一个数据库实例。也就是说，您无法将备份文件还原到已包含您正在还原的数据库的数据库实例。对数据库进行重命名不是消除此限制的办法。 </p>
+</blockquote>
+<h2 id="DownloadCompleteDBLogFile"><a href="#DownloadCompleteDBLogFile" class="headerlink" title="DownloadCompleteDBLogFile"></a>DownloadCompleteDBLogFile</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonRDS/latest/UserGuide/RESTReference.DownloadCompleteDBLogFile.html" target="_blank" rel="noopener">DOC</a><br>由于数据库日志文件可能为任意大小，因此提供了 DownloadCompleteDBLogFile REST API 以实现对日志文件内容的流式传输。</p>
+<ul>
+<li>用RDS 备份数据库文件  还原到RDS 上，要删除掉原来 的 database 才可以还原成功 </li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Amazon RDS 当前不支持以下 SQL Server 功能：</span><br><span class="line">维护计划</span><br><span class="line">数据库邮件</span><br><span class="line">分布式查询（即，链接服务器）</span><br><span class="line">数据库日志传输</span><br><span class="line">变更数据捕获 (CDC) – 考虑使用变更跟踪来替代 CDC。</span><br><span class="line">复制</span><br><span class="line">在该数据库实例所在的同一个服务器上运行“Reporting”、“Analysis”、“Integration”或“Master Data Services”的能力。. 如果需要执行此操作，建议在 EC2 实例上安装 SQL Server，或使用本地 SQL Server 实例作为“Reporting”、“Analysis”、“Integration”或“Master Data Services”的服务器。</span><br><span class="line">性能数据收集器</span><br><span class="line">服务代理或其他 T-SQL 终端节点（使用 CREATE ENDPOINT 的所有操作不可用）</span><br><span class="line">Distribution Transaction Coordinator (MSDTC)</span><br><span class="line">WCF Data Services</span><br><span class="line">FILESTREAM 支持</span><br><span class="line">基于策略的管理</span><br><span class="line">SQL Server Audit</span><br><span class="line">BULK INSERT 和 OPENROWSET(BULK...) 功能</span><br><span class="line">数据质量服务</span><br><span class="line">即时文件初始化</span><br><span class="line">始终开启（2012 企业版）</span><br><span class="line">文件表</span><br><span class="line">服务器级别触发器</span><br></pre></td></tr></table></figure>
+
+      
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/02/21/AWS-RDS/">AWS RDS</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 ccccccmd 的个人博客">ccccccmd</a></p>
+        <p><span>发布时间:</span>2017年02月21日 - 23时16分</p>
+        <p><span>最后更新:</span>2017年05月29日 - 17时45分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/02/21/AWS-RDS/" title="AWS RDS">http://ccccccmd.rootu.cn/2017/02/21/AWS-RDS/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://ccccccmd.rootu.cn/2017/02/21/AWS-RDS/　　作者: ccccccmd" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2017/02/21/AWS-Others/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          AWS 其他产品
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/02/21/AWS-S3/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">AWS S3</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RDS"><span class="toc-number">1.</span> <span class="toc-text">RDS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Amazon-RDS-for-SQL-Server"><span class="toc-number">2.</span> <span class="toc-text">Amazon RDS for SQL Server</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#价格"><span class="toc-number">3.</span> <span class="toc-text">价格</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#入门"><span class="toc-number">4.</span> <span class="toc-text">入门</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#针对单独的数据库"><span class="toc-number">5.</span> <span class="toc-text">针对单独的数据库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DownloadCompleteDBLogFile"><span class="toc-number">6.</span> <span class="toc-text">DownloadCompleteDBLogFile</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+
+
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2017/02/21/AWS-Others/" title="上一篇: AWS 其他产品">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2017/02/21/AWS-S3/" title="下一篇: AWS S3">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/08/04/wordpress-via-docker/">docker-compose 的方式安装 wordpress</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/">在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/20/abp-on-linux/">abp core on centos</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/14/iis-net-core/">Asp.net core on IIS</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/07/await-and-async/">await和async</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/EFBulkInsert/">EF中的批量插入</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/mongodb/">mongodb</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/hangfire/">hangfire</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/distributed-lock/">分布式锁Foundatio.Lock</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/cqrs/">使用消息总线 masstransit</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/vue/">使用Vue.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/25/rabbitmq/">rabbitmq</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/24/ELK/">ELK</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Net Core On Linux/">.Net Core On Linux</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Hexo/">Hexo迁移</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/NetCore/">.Net Core 中间件</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/tyk/">tyk-gateway</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/04/04/Autofac-二/">Autofac(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/30/CLR/">CLR 总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-Others/">AWS 其他产品</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-RDS/">AWS RDS</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-S3/">AWS S3</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/13/autofac/">Autofac(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/16/java-review/">java-review</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/identityserver/">identityserver</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/abp-angular/">ABP and Angular</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/docker/">Docker</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/探索angular/">angular.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/表达式树-一/">表达式树(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/15/微信支付/">微信支付</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/MiniProfiler/">MiniProfiler</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/cdn-image-cqrs/">cdn-image-cqrs</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/webclient-timeout/">webclient-timeout</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/24/EF中的Attach和Entry/">EF中的Attach和Entry</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/16/ghost升级/">Ghost升级</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/15/Exceptionless-本地部署/">Exceptionless 本地部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/03/Quartz-net/">Quartz.net（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/01/mysqlfirst/">mysqlfirst</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/EF的One to Zero,One关系/">EF的One to Zero,One关系</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/17/phpfirst/">PHP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/03/eftrackingandstate/">EF的实体追踪/动态代理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/02/eflocaldata/">使用EF的本地数据</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/01/EntityFramework/">EF加载实体的三种模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/29/abp-begin/">ABP起步</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/19/ModelFirstInExistDb/">ModelFirstInExistDb</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/18/FluentAPI/">FluentAPI</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/11/Heox-博客搭建/">Hexo 博客搭建</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2018 ccccccmd
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> 
+				<p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 3;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>
