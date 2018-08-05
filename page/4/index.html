@@ -204,85 +204,6 @@
 </nav>
       <div class="body-wrap">
   
-    <article id="post-NetCore" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2017/05/29/NetCore/" class="article-date">
-      <time datetime="2017-05-29T01:02:45.000Z" itemprop="datePublished">2017-05-29</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/29/NetCore/">.Net Core 中间件</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-        <p><code>Startup</code>中的<code>Configure</code>方法和<code>ConfigureServices</code>方法</p>
-<p> Configure方法最重要的作用就是向管道中添加中间件。该方法必须有一个<code>IApplicationBuilder</code>参数，而该接口中有一个<code>Use</code>方法，他就是用来注册中间件的。<br>   // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.</p>
-<p> UseStaticFiles、UseIdentity、UseMvc都是IApplicationBuilder上的扩展方法，在扩展方法中，都会通过调用扩展方法app.UseMiddleware方法，最终再调用app.Use方法来注册新的Middleware</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public interface IApplicationBuilder</span><br><span class="line">&#123;</span><br><span class="line">    //...</span><br><span class="line">    IApplicationBuilder Use(Func&lt;RequestDelegate, RequestDelegate&gt; middleware);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>ConfigureServices 在Setup中是用来配置这些应用程序所需要的服务的，如配置连接字符串等。所以，该方法要在Configure之前调用。</p>
-<p>  // This method gets called by the runtime. Use this method to add services to the container.</p>
-<p>在ASP.NET5中的各种默认的Middleware中，都使用了依赖注入的功能，所以在使用Middleware中的功能时，需要提前将依赖注入所需要的类型及映射关系都注册到依赖注入管理系统中，即IServiceCollection集合，而ConfigureServices方法接收的就一个IServiceCollection类型的参数，该参数就是所有注册过类型的集合，通过原生的依赖注入组件进行管理（关于ASP.NET5中的依赖注入，我们会在单独章节中进行讲解），在该方法内，我们可以向该集合中添加新的类型和类型映射关系</p>
-<h3 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h3><p>middleware是Func&lt;RequestDelegate, RequestDelegate&gt;的一个实例，该Func接收一个RequestDelegate的参数，并返回一个RequestDelegate类型的值</p>
-<p>RequestDelegate的源码如下：<br>public delegate Task RequestDelegate(HttpContext context);</p>
-<p>RequestDelegate是一个委托函数，其接收HttpContext类型的实例，并返回一个Task类型的异步对象。也就是说RequestDelegate是一个<strong>可以返回自身RequestDelegate</strong>类型函数的函数，整个ASP.NET也就是利用这种方式构建了管线（Pipelien）的组成，在这里，每个middleware都链式到下一个middleware上，并在整个过程中可以对HttpConext对象进行修改或维护</p>
-<h3 id="Middleware的注册有很多种方式，如下是实例型注册代码："><a href="#Middleware的注册有很多种方式，如下是实例型注册代码：" class="headerlink" title="Middleware的注册有很多种方式，如下是实例型注册代码："></a>Middleware的注册有很多种方式，如下是实例型注册代码：</h3><p>app.Use(next =&gt; new TimeRecorderMiddleware(next).Invoke);<br>或者，你也可以使用UseMiddleware扩展方法进行注册，示例如下：</p>
-<p>app.UseMiddleware<timerecordermiddleware>();<br>app.UseMiddleware(typeof(TimeRecorderMiddleware)); 两种方式都可以<br>当然，你也可以定义一个自己的扩展方法用于注册该Middleware，代码如下：</timerecordermiddleware></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public static IApplicationBuilder UseTimeRecorderMiddleware(this IApplicationBuilder app)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">return</span> app.UseMiddleware&lt;TimeRecorderMiddleware&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">/// &lt;summary&gt;</span><br><span class="line">/// 抽象基类</span><br><span class="line">/// &lt;/summary&gt;</span><br><span class="line">public abstract class AbstractMiddleware</span><br><span class="line">&#123;</span><br><span class="line">    protected RequestDelegate Next &#123; get; <span class="built_in">set</span>; &#125;</span><br><span class="line">    protected AbstractMiddleware(RequestDelegate next)</span><br><span class="line">    &#123;</span><br><span class="line">        this.Next = next;</span><br><span class="line">    &#125;</span><br><span class="line">    public abstract Task Invoke(HttpContext context);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// &lt;summary&gt;</span><br><span class="line">/// 示例Middleware</span><br><span class="line">/// &lt;/summary&gt;</span><br><span class="line">public class DemoMiddleware : AbstractMiddleware</span><br><span class="line">&#123;</span><br><span class="line">    public DemoMiddleware(RequestDelegate next) : base(next)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    public async override Task Invoke(HttpContext context)</span><br><span class="line">    &#123;</span><br><span class="line">        Console.WriteLine(<span class="string">"DemoMiddleware Start."</span>);</span><br><span class="line">        await Next.Invoke(context);</span><br><span class="line">        Console.WriteLine(<span class="string">"DemoMiddleware End."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>中间件使用的配置项有两种添加方法，一种是添加到 AddMiddleware(Action<xxxoptions> option) 另外一种是 UseMiddleware&lt;&gt;(Action<xxxoptions> option)，那么这两种有什么区别呢？<br>那么，前者Add中的配置项一般情况下是中间执行之前就需要的一些信息，也就是说中间件的启动就依赖于这些配置项，他放置于容器配置（Add DI Service）的时候添加进去更加方便或者合适的时候使用它，另外一种（后者）是容器已经构建完毕，不需要依赖于容器提供的配置项可以使用此种方式。</xxxoptions></xxxoptions></p>
-<p><a href="http://www.cnblogs.com/TomXu/p/4496435.html" target="_blank" rel="noopener">汤姆大叔</a></p>
-<p><a href="http://www.cnblogs.com/savorboard/p/aspnetcore-http-pipeline.html" target="_blank" rel="noopener">savorboard</a></p>
-
-      
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-    <div class="article-category tagcloud">
-    <a class="article-category-link" href="/categories/Net-Core/">.Net Core</a>
-    </div>
-
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Net-Core/">.Net Core</a></li></ul>
-    </div>
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
     <article id="post-tyk" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
@@ -367,6 +288,85 @@
       
     <div class="article-tag tagcloud">
         <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/TYK/">TYK</a></li></ul>
+    </div>
+
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-NetCore" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/05/29/NetCore/" class="article-date">
+      <time datetime="2017-05-29T01:02:45.000Z" itemprop="datePublished">2017-05-29</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/05/29/NetCore/">.Net Core 中间件</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p><code>Startup</code>中的<code>Configure</code>方法和<code>ConfigureServices</code>方法</p>
+<p> Configure方法最重要的作用就是向管道中添加中间件。该方法必须有一个<code>IApplicationBuilder</code>参数，而该接口中有一个<code>Use</code>方法，他就是用来注册中间件的。<br>   // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.</p>
+<p> UseStaticFiles、UseIdentity、UseMvc都是IApplicationBuilder上的扩展方法，在扩展方法中，都会通过调用扩展方法app.UseMiddleware方法，最终再调用app.Use方法来注册新的Middleware</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public interface IApplicationBuilder</span><br><span class="line">&#123;</span><br><span class="line">    //...</span><br><span class="line">    IApplicationBuilder Use(Func&lt;RequestDelegate, RequestDelegate&gt; middleware);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ConfigureServices 在Setup中是用来配置这些应用程序所需要的服务的，如配置连接字符串等。所以，该方法要在Configure之前调用。</p>
+<p>  // This method gets called by the runtime. Use this method to add services to the container.</p>
+<p>在ASP.NET5中的各种默认的Middleware中，都使用了依赖注入的功能，所以在使用Middleware中的功能时，需要提前将依赖注入所需要的类型及映射关系都注册到依赖注入管理系统中，即IServiceCollection集合，而ConfigureServices方法接收的就一个IServiceCollection类型的参数，该参数就是所有注册过类型的集合，通过原生的依赖注入组件进行管理（关于ASP.NET5中的依赖注入，我们会在单独章节中进行讲解），在该方法内，我们可以向该集合中添加新的类型和类型映射关系</p>
+<h3 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h3><p>middleware是Func&lt;RequestDelegate, RequestDelegate&gt;的一个实例，该Func接收一个RequestDelegate的参数，并返回一个RequestDelegate类型的值</p>
+<p>RequestDelegate的源码如下：<br>public delegate Task RequestDelegate(HttpContext context);</p>
+<p>RequestDelegate是一个委托函数，其接收HttpContext类型的实例，并返回一个Task类型的异步对象。也就是说RequestDelegate是一个<strong>可以返回自身RequestDelegate</strong>类型函数的函数，整个ASP.NET也就是利用这种方式构建了管线（Pipelien）的组成，在这里，每个middleware都链式到下一个middleware上，并在整个过程中可以对HttpConext对象进行修改或维护</p>
+<h3 id="Middleware的注册有很多种方式，如下是实例型注册代码："><a href="#Middleware的注册有很多种方式，如下是实例型注册代码：" class="headerlink" title="Middleware的注册有很多种方式，如下是实例型注册代码："></a>Middleware的注册有很多种方式，如下是实例型注册代码：</h3><p>app.Use(next =&gt; new TimeRecorderMiddleware(next).Invoke);<br>或者，你也可以使用UseMiddleware扩展方法进行注册，示例如下：</p>
+<p>app.UseMiddleware<timerecordermiddleware>();<br>app.UseMiddleware(typeof(TimeRecorderMiddleware)); 两种方式都可以<br>当然，你也可以定义一个自己的扩展方法用于注册该Middleware，代码如下：</timerecordermiddleware></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public static IApplicationBuilder UseTimeRecorderMiddleware(this IApplicationBuilder app)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">return</span> app.UseMiddleware&lt;TimeRecorderMiddleware&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">/// &lt;summary&gt;</span><br><span class="line">/// 抽象基类</span><br><span class="line">/// &lt;/summary&gt;</span><br><span class="line">public abstract class AbstractMiddleware</span><br><span class="line">&#123;</span><br><span class="line">    protected RequestDelegate Next &#123; get; <span class="built_in">set</span>; &#125;</span><br><span class="line">    protected AbstractMiddleware(RequestDelegate next)</span><br><span class="line">    &#123;</span><br><span class="line">        this.Next = next;</span><br><span class="line">    &#125;</span><br><span class="line">    public abstract Task Invoke(HttpContext context);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// &lt;summary&gt;</span><br><span class="line">/// 示例Middleware</span><br><span class="line">/// &lt;/summary&gt;</span><br><span class="line">public class DemoMiddleware : AbstractMiddleware</span><br><span class="line">&#123;</span><br><span class="line">    public DemoMiddleware(RequestDelegate next) : base(next)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    public async override Task Invoke(HttpContext context)</span><br><span class="line">    &#123;</span><br><span class="line">        Console.WriteLine(<span class="string">"DemoMiddleware Start."</span>);</span><br><span class="line">        await Next.Invoke(context);</span><br><span class="line">        Console.WriteLine(<span class="string">"DemoMiddleware End."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>中间件使用的配置项有两种添加方法，一种是添加到 AddMiddleware(Action<xxxoptions> option) 另外一种是 UseMiddleware&lt;&gt;(Action<xxxoptions> option)，那么这两种有什么区别呢？<br>那么，前者Add中的配置项一般情况下是中间执行之前就需要的一些信息，也就是说中间件的启动就依赖于这些配置项，他放置于容器配置（Add DI Service）的时候添加进去更加方便或者合适的时候使用它，另外一种（后者）是容器已经构建完毕，不需要依赖于容器提供的配置项可以使用此种方式。</xxxoptions></xxxoptions></p>
+<p><a href="http://www.cnblogs.com/TomXu/p/4496435.html" target="_blank" rel="noopener">汤姆大叔</a></p>
+<p><a href="http://www.cnblogs.com/savorboard/p/aspnetcore-http-pipeline.html" target="_blank" rel="noopener">savorboard</a></p>
+
+      
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Net-Core/">.Net Core</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Net-Core/">.Net Core</a></li></ul>
     </div>
 
       
@@ -540,10 +540,10 @@
 
 
   
-    <article id="post-AWS-Others" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-AWS-RDS" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2017/02/21/AWS-Others/" class="article-date">
+      <a href="/2017/02/21/AWS-RDS/" class="article-date">
       <time datetime="2017-02-21T15:16:28.000Z" itemprop="datePublished">2017-02-21</time>
 </a>
     </div>
@@ -557,7 +557,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/02/21/AWS-Others/">AWS 其他产品</a>
+      <a class="article-title" href="/2017/02/21/AWS-RDS/">AWS RDS</a>
     </h1>
   
 
@@ -567,22 +567,16 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-              <h2 id="Elastic-Load-Balancing"><a href="#Elastic-Load-Balancing" class="headerlink" title="Elastic Load Balancing"></a>Elastic Load Balancing</h2><p><a href="http://docs.aws.amazon.com/zh_cn/elasticloadbalancing/latest/userguide/what-is-load-balancing.html" target="_blank" rel="noopener">简介</a></p>
-<p><a href="http://docs.aws.amazon.com/zh_cn/elasticloadbalancing/latest/userguide/load-balancer-getting-started.html" target="_blank" rel="noopener">入门</a></p>
-<h2 id="Amazon-SQS"><a href="#Amazon-SQS" class="headerlink" title="Amazon SQS"></a>Amazon SQS</h2><p><a href="https://aws.amazon.com/cn/sqs/details/" target="_blank" rel="noopener">简介</a></p>
-<ul>
-<li>标准队列</li>
+              <h2 id="RDS"><a href="#RDS" class="headerlink" title="RDS"></a>RDS</h2><ul>
+<li><a href="https://aws.amazon.com/cn/rds/getting-started/" target="_blank" rel="noopener">简介</a><br>Amazon Relational Database Service (Amazon RDS) 让您能够在云中轻松设置、操作和扩展关系数据库。它在管理耗时的数据库管理任务的同时，可提供经济实用的可调容量，使您能够腾出时间专注于应用程序和业务。Amazon RDS 提供六种常用的数据库引擎供您选择，即 Amazon Aurora、PostgreSQL、MySQL、MariaDB、Oracle 和 Microsoft SQL Server。</li>
 </ul>
-<p>标准队列使您能够每秒处理近乎无限数量的事务。标准队列可确保每条消息至少被传送一次。</p>
+<h2 id="Amazon-RDS-for-SQL-Server"><a href="#Amazon-RDS-for-SQL-Server" class="headerlink" title="Amazon RDS for SQL Server"></a>Amazon RDS for SQL Server</h2><p><a href="https://aws.amazon.com/cn/rds/sqlserver/" target="_blank" rel="noopener">https://aws.amazon.com/cn/rds/sqlserver/</a></p>
 <ul>
-<li>FIFO 队列</li>
+<li>备份和灾难恢复(针对实例)</li>
 </ul>
-<p>这种队列类型最重要的功能是 FIFO (先进先出) 传送和一次性处理：让消息的发送顺序和接收顺序严格保持一致，且消息只传送一次并保留到用户将其处理和删除；重复的消息不会被引入队列。FIFO 队列还支持消息组，即允许在单个队列中传送多个有序流。FIFO 队列仅限 300 笔交易/秒 (TPS)，但具有标准队列的所有功能。</p>
-<ul>
-<li>特点</li>
-</ul>
-<p>消息可以在队列中最多保留 14 天。</p>
-<p>开发人员可以创建任意数量的 Amazon SQS 队列，队列可包含无限数量的消息。</p>
+<p>自动备份 – Amazon RDS 的自动备份功能在默认情况下打开，实现数据库实例的时间点恢复。Amazon RDS 以 5 分钟为间隔备份您的数据库和事务日志，并且按您指定的保留期进行存储。这样，您就能够将数据库实例恢复到保留期内任何一秒钟的状态，最多可恢复到前五分钟的状态。自动备份保留期可配置为最长 35 天。</p>
+<p>数据库快照 – 数据库快照是用户启动的数据库实例备份。Amazon RDS 将存储这些完整数据库备份，直至您明确删除它们。您可以在需要时随时从数据库快照创建新数据库实例。</p>
+<p>适用于 Microsoft SQL Server 的 Amazon RDS 不支持将数据导入 msdb 数据库。</p>
           
       
       
@@ -598,12 +592,12 @@
 
       
     <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RDS-Others/">RDS Others</a></li></ul>
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RDS/">RDS</a></li></ul>
     </div>
 
       
         <p class="article-more-link">
-          <a  href="/2017/02/21/AWS-Others/#more">探索 >></a>
+          <a  href="/2017/02/21/AWS-RDS/#more">探索 >></a>
         </p>
       
       <div class="clearfix"></div>

@@ -875,43 +875,6 @@ port=0;
     </entry>
     
     <entry>
-      <title><![CDATA[.Net Core 中间件]]></title>
-      <url>http://ccccccmd.rootu.cn/2017/05/29/NetCore/</url>
-      <content type="html"><![CDATA[<p><code>Startup</code>中的<code>Configure</code>方法和<code>ConfigureServices</code>方法</p>
-<p> Configure方法最重要的作用就是向管道中添加中间件。该方法必须有一个<code>IApplicationBuilder</code>参数，而该接口中有一个<code>Use</code>方法，他就是用来注册中间件的。<br>   // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.</p>
-<p> UseStaticFiles、UseIdentity、UseMvc都是IApplicationBuilder上的扩展方法，在扩展方法中，都会通过调用扩展方法app.UseMiddleware方法，最终再调用app.Use方法来注册新的Middleware</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public interface IApplicationBuilder</span><br><span class="line">&#123;</span><br><span class="line">    //...</span><br><span class="line">    IApplicationBuilder Use(Func&lt;RequestDelegate, RequestDelegate&gt; middleware);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>ConfigureServices 在Setup中是用来配置这些应用程序所需要的服务的，如配置连接字符串等。所以，该方法要在Configure之前调用。</p>
-<p>  // This method gets called by the runtime. Use this method to add services to the container.</p>
-<p>在ASP.NET5中的各种默认的Middleware中，都使用了依赖注入的功能，所以在使用Middleware中的功能时，需要提前将依赖注入所需要的类型及映射关系都注册到依赖注入管理系统中，即IServiceCollection集合，而ConfigureServices方法接收的就一个IServiceCollection类型的参数，该参数就是所有注册过类型的集合，通过原生的依赖注入组件进行管理（关于ASP.NET5中的依赖注入，我们会在单独章节中进行讲解），在该方法内，我们可以向该集合中添加新的类型和类型映射关系</p>
-<h3 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h3><p>middleware是Func&lt;RequestDelegate, RequestDelegate&gt;的一个实例，该Func接收一个RequestDelegate的参数，并返回一个RequestDelegate类型的值</p>
-<p>RequestDelegate的源码如下：<br>public delegate Task RequestDelegate(HttpContext context);</p>
-<p>RequestDelegate是一个委托函数，其接收HttpContext类型的实例，并返回一个Task类型的异步对象。也就是说RequestDelegate是一个<strong>可以返回自身RequestDelegate</strong>类型函数的函数，整个ASP.NET也就是利用这种方式构建了管线（Pipelien）的组成，在这里，每个middleware都链式到下一个middleware上，并在整个过程中可以对HttpConext对象进行修改或维护</p>
-<h3 id="Middleware的注册有很多种方式，如下是实例型注册代码："><a href="#Middleware的注册有很多种方式，如下是实例型注册代码：" class="headerlink" title="Middleware的注册有很多种方式，如下是实例型注册代码："></a>Middleware的注册有很多种方式，如下是实例型注册代码：</h3><p>app.Use(next =&gt; new TimeRecorderMiddleware(next).Invoke);<br>或者，你也可以使用UseMiddleware扩展方法进行注册，示例如下：</p>
-<p>app.UseMiddleware<timerecordermiddleware>();<br>app.UseMiddleware(typeof(TimeRecorderMiddleware)); 两种方式都可以<br>当然，你也可以定义一个自己的扩展方法用于注册该Middleware，代码如下：</timerecordermiddleware></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public static IApplicationBuilder UseTimeRecorderMiddleware(this IApplicationBuilder app)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">return</span> app.UseMiddleware&lt;TimeRecorderMiddleware&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">/// &lt;summary&gt;</span><br><span class="line">/// 抽象基类</span><br><span class="line">/// &lt;/summary&gt;</span><br><span class="line">public abstract class AbstractMiddleware</span><br><span class="line">&#123;</span><br><span class="line">    protected RequestDelegate Next &#123; get; <span class="built_in">set</span>; &#125;</span><br><span class="line">    protected AbstractMiddleware(RequestDelegate next)</span><br><span class="line">    &#123;</span><br><span class="line">        this.Next = next;</span><br><span class="line">    &#125;</span><br><span class="line">    public abstract Task Invoke(HttpContext context);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// &lt;summary&gt;</span><br><span class="line">/// 示例Middleware</span><br><span class="line">/// &lt;/summary&gt;</span><br><span class="line">public class DemoMiddleware : AbstractMiddleware</span><br><span class="line">&#123;</span><br><span class="line">    public DemoMiddleware(RequestDelegate next) : base(next)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    public async override Task Invoke(HttpContext context)</span><br><span class="line">    &#123;</span><br><span class="line">        Console.WriteLine(<span class="string">"DemoMiddleware Start."</span>);</span><br><span class="line">        await Next.Invoke(context);</span><br><span class="line">        Console.WriteLine(<span class="string">"DemoMiddleware End."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>中间件使用的配置项有两种添加方法，一种是添加到 AddMiddleware(Action<xxxoptions> option) 另外一种是 UseMiddleware&lt;&gt;(Action<xxxoptions> option)，那么这两种有什么区别呢？<br>那么，前者Add中的配置项一般情况下是中间执行之前就需要的一些信息，也就是说中间件的启动就依赖于这些配置项，他放置于容器配置（Add DI Service）的时候添加进去更加方便或者合适的时候使用它，另外一种（后者）是容器已经构建完毕，不需要依赖于容器提供的配置项可以使用此种方式。</xxxoptions></xxxoptions></p>
-<p><a href="http://www.cnblogs.com/TomXu/p/4496435.html" target="_blank" rel="noopener">汤姆大叔</a></p>
-<p><a href="http://www.cnblogs.com/savorboard/p/aspnetcore-http-pipeline.html" target="_blank" rel="noopener">savorboard</a></p>
-]]></content>
-      
-        <categories>
-            
-            <category> .Net Core </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> .Net Core </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[tyk-gateway]]></title>
       <url>http://ccccccmd.rootu.cn/2017/05/29/tyk/</url>
       <content type="html"><![CDATA[<p>注意，yum源的配置文件前面不要有空格<br><a href="http://dl.fedoraproject.org/pub/epel/7/x86_64/e/" target="_blank" rel="noopener">http://dl.fedoraproject.org/pub/epel/7/x86_64/e/</a></p>
@@ -967,6 +930,43 @@ port=0;
         <tags>
             
             <tag> TYK </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[.Net Core 中间件]]></title>
+      <url>http://ccccccmd.rootu.cn/2017/05/29/NetCore/</url>
+      <content type="html"><![CDATA[<p><code>Startup</code>中的<code>Configure</code>方法和<code>ConfigureServices</code>方法</p>
+<p> Configure方法最重要的作用就是向管道中添加中间件。该方法必须有一个<code>IApplicationBuilder</code>参数，而该接口中有一个<code>Use</code>方法，他就是用来注册中间件的。<br>   // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.</p>
+<p> UseStaticFiles、UseIdentity、UseMvc都是IApplicationBuilder上的扩展方法，在扩展方法中，都会通过调用扩展方法app.UseMiddleware方法，最终再调用app.Use方法来注册新的Middleware</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public interface IApplicationBuilder</span><br><span class="line">&#123;</span><br><span class="line">    //...</span><br><span class="line">    IApplicationBuilder Use(Func&lt;RequestDelegate, RequestDelegate&gt; middleware);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ConfigureServices 在Setup中是用来配置这些应用程序所需要的服务的，如配置连接字符串等。所以，该方法要在Configure之前调用。</p>
+<p>  // This method gets called by the runtime. Use this method to add services to the container.</p>
+<p>在ASP.NET5中的各种默认的Middleware中，都使用了依赖注入的功能，所以在使用Middleware中的功能时，需要提前将依赖注入所需要的类型及映射关系都注册到依赖注入管理系统中，即IServiceCollection集合，而ConfigureServices方法接收的就一个IServiceCollection类型的参数，该参数就是所有注册过类型的集合，通过原生的依赖注入组件进行管理（关于ASP.NET5中的依赖注入，我们会在单独章节中进行讲解），在该方法内，我们可以向该集合中添加新的类型和类型映射关系</p>
+<h3 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h3><p>middleware是Func&lt;RequestDelegate, RequestDelegate&gt;的一个实例，该Func接收一个RequestDelegate的参数，并返回一个RequestDelegate类型的值</p>
+<p>RequestDelegate的源码如下：<br>public delegate Task RequestDelegate(HttpContext context);</p>
+<p>RequestDelegate是一个委托函数，其接收HttpContext类型的实例，并返回一个Task类型的异步对象。也就是说RequestDelegate是一个<strong>可以返回自身RequestDelegate</strong>类型函数的函数，整个ASP.NET也就是利用这种方式构建了管线（Pipelien）的组成，在这里，每个middleware都链式到下一个middleware上，并在整个过程中可以对HttpConext对象进行修改或维护</p>
+<h3 id="Middleware的注册有很多种方式，如下是实例型注册代码："><a href="#Middleware的注册有很多种方式，如下是实例型注册代码：" class="headerlink" title="Middleware的注册有很多种方式，如下是实例型注册代码："></a>Middleware的注册有很多种方式，如下是实例型注册代码：</h3><p>app.Use(next =&gt; new TimeRecorderMiddleware(next).Invoke);<br>或者，你也可以使用UseMiddleware扩展方法进行注册，示例如下：</p>
+<p>app.UseMiddleware<timerecordermiddleware>();<br>app.UseMiddleware(typeof(TimeRecorderMiddleware)); 两种方式都可以<br>当然，你也可以定义一个自己的扩展方法用于注册该Middleware，代码如下：</timerecordermiddleware></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public static IApplicationBuilder UseTimeRecorderMiddleware(this IApplicationBuilder app)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">return</span> app.UseMiddleware&lt;TimeRecorderMiddleware&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">/// &lt;summary&gt;</span><br><span class="line">/// 抽象基类</span><br><span class="line">/// &lt;/summary&gt;</span><br><span class="line">public abstract class AbstractMiddleware</span><br><span class="line">&#123;</span><br><span class="line">    protected RequestDelegate Next &#123; get; <span class="built_in">set</span>; &#125;</span><br><span class="line">    protected AbstractMiddleware(RequestDelegate next)</span><br><span class="line">    &#123;</span><br><span class="line">        this.Next = next;</span><br><span class="line">    &#125;</span><br><span class="line">    public abstract Task Invoke(HttpContext context);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// &lt;summary&gt;</span><br><span class="line">/// 示例Middleware</span><br><span class="line">/// &lt;/summary&gt;</span><br><span class="line">public class DemoMiddleware : AbstractMiddleware</span><br><span class="line">&#123;</span><br><span class="line">    public DemoMiddleware(RequestDelegate next) : base(next)</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    public async override Task Invoke(HttpContext context)</span><br><span class="line">    &#123;</span><br><span class="line">        Console.WriteLine(<span class="string">"DemoMiddleware Start."</span>);</span><br><span class="line">        await Next.Invoke(context);</span><br><span class="line">        Console.WriteLine(<span class="string">"DemoMiddleware End."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>中间件使用的配置项有两种添加方法，一种是添加到 AddMiddleware(Action<xxxoptions> option) 另外一种是 UseMiddleware&lt;&gt;(Action<xxxoptions> option)，那么这两种有什么区别呢？<br>那么，前者Add中的配置项一般情况下是中间执行之前就需要的一些信息，也就是说中间件的启动就依赖于这些配置项，他放置于容器配置（Add DI Service）的时候添加进去更加方便或者合适的时候使用它，另外一种（后者）是容器已经构建完毕，不需要依赖于容器提供的配置项可以使用此种方式。</xxxoptions></xxxoptions></p>
+<p><a href="http://www.cnblogs.com/TomXu/p/4496435.html" target="_blank" rel="noopener">汤姆大叔</a></p>
+<p><a href="http://www.cnblogs.com/savorboard/p/aspnetcore-http-pipeline.html" target="_blank" rel="noopener">savorboard</a></p>
+]]></content>
+      
+        <categories>
+            
+            <category> .Net Core </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> .Net Core </tag>
             
         </tags>
         
@@ -1041,74 +1041,6 @@ port=0;
     </entry>
     
     <entry>
-      <title><![CDATA[AWS 其他产品]]></title>
-      <url>http://ccccccmd.rootu.cn/2017/02/21/AWS-Others/</url>
-      <content type="html"><![CDATA[<h2 id="Elastic-Load-Balancing"><a href="#Elastic-Load-Balancing" class="headerlink" title="Elastic Load Balancing"></a>Elastic Load Balancing</h2><p><a href="http://docs.aws.amazon.com/zh_cn/elasticloadbalancing/latest/userguide/what-is-load-balancing.html" target="_blank" rel="noopener">简介</a></p>
-<p><a href="http://docs.aws.amazon.com/zh_cn/elasticloadbalancing/latest/userguide/load-balancer-getting-started.html" target="_blank" rel="noopener">入门</a></p>
-<h2 id="Amazon-SQS"><a href="#Amazon-SQS" class="headerlink" title="Amazon SQS"></a>Amazon SQS</h2><p><a href="https://aws.amazon.com/cn/sqs/details/" target="_blank" rel="noopener">简介</a></p>
-<ul>
-<li>标准队列</li>
-</ul>
-<p>标准队列使您能够每秒处理近乎无限数量的事务。标准队列可确保每条消息至少被传送一次。</p>
-<ul>
-<li>FIFO 队列</li>
-</ul>
-<p>这种队列类型最重要的功能是 FIFO (先进先出) 传送和一次性处理：让消息的发送顺序和接收顺序严格保持一致，且消息只传送一次并保留到用户将其处理和删除；重复的消息不会被引入队列。FIFO 队列还支持消息组，即允许在单个队列中传送多个有序流。FIFO 队列仅限 300 笔交易/秒 (TPS)，但具有标准队列的所有功能。</p>
-<ul>
-<li>特点</li>
-</ul>
-<p>消息可以在队列中最多保留 14 天。</p>
-<p>开发人员可以创建任意数量的 Amazon SQS 队列，队列可包含无限数量的消息。</p>
-<a id="more"></a>
-<ul>
-<li>价格</li>
-</ul>
-<p><a href="https://aws.amazon.com/cn/sqs/pricing/" target="_blank" rel="noopener">计费</a></p>
-<p>Amazon SQS 请求定价<br>    标准队列<br>    0.40 USD (每个请求 0.00000040 USD)<br>    FIFO 队列<br>    0.50 USD (每个请求 0.00000050 USD)</p>
-<p>Amazon SQS 数据传输定价</p>
-<ul>
-<li>开发</li>
-</ul>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AWSSimpleQueueService/latest/SQSDeveloperGuide/Welcome.html" target="_blank" rel="noopener">DOC</a></p>
-<p><a href="https://docs.aws.amazon.com/sdk-for-net/v3/developer-guide/sqs-apis-intro.html" target="_blank" rel="noopener">Code Examples</a></p>
-<h2 id="Amazon-CloudFront"><a href="#Amazon-CloudFront" class="headerlink" title="Amazon CloudFront"></a>Amazon CloudFront</h2><ul>
-<li>CDN</li>
-</ul>
-<h2 id="Amazon-ElastiCache-分布式缓存"><a href="#Amazon-ElastiCache-分布式缓存" class="headerlink" title="Amazon ElastiCache  分布式缓存"></a>Amazon ElastiCache  分布式缓存</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonElastiCache/latest/UserGuide/WhatIs.html" target="_blank" rel="noopener">文档</a></p>
-<h2 id="VPC"><a href="#VPC" class="headerlink" title="VPC"></a>VPC</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Introduction.html?shortFooter=true" target="_blank" rel="noopener">什么是VPC</a></p>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/GettingStartedGuide/ExerciseOverview.html" target="_blank" rel="noopener">vpc 文档</a></p>
-<ul>
-<li>它在逻辑上与 AWS 云中的其他虚拟网络隔绝。可在 VPC 中启动 AWS 资源</li>
-</ul>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Subnets.html?shortFooter=true#vpc-subnet-basics" target="_blank" rel="noopener">VPC和子网</a></p>
-<ul>
-<li>每个子网都必须关联一个路由表，这个路由表可指定允许出站流量离开子网的可用路由。您创建的每个子网都会自动关联 VPC 的主路由表。</li>
-</ul>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html?shortFooter=true#Add_IGW_Attach_Gateway" target="_blank" rel="noopener">Internet 网关</a></p>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Route_Tables.html?shortFooter=true" target="_blank" rel="noopener">路由表</a></p>
-<ul>
-<li>在您的 VPC 中的每个子网必须与一个路由表关联；路由表控制子网的路由。一个子网一次只能与一个路由表关联，但您可以将多个子网与同一路由表关联。</li>
-</ul>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html?shortFooter=true" target="_blank" rel="noopener">安全组</a></p>
-<h2 id="Amazon-CloudWatch"><a href="#Amazon-CloudWatch" class="headerlink" title="Amazon CloudWatch"></a>Amazon CloudWatch</h2><p><a href="https://docs.amazonaws.cn/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html" target="_blank" rel="noopener">创建报警</a></p>
-]]></content>
-      
-        <categories>
-            
-            <category> AWS </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> RDS Others </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[AWS RDS]]></title>
       <url>http://ccccccmd.rootu.cn/2017/02/21/AWS-RDS/</url>
       <content type="html"><![CDATA[<h2 id="RDS"><a href="#RDS" class="headerlink" title="RDS"></a>RDS</h2><ul>
@@ -1179,6 +1111,74 @@ port=0;
         <tags>
             
             <tag> RDS </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[AWS 其他产品]]></title>
+      <url>http://ccccccmd.rootu.cn/2017/02/21/AWS-Others/</url>
+      <content type="html"><![CDATA[<h2 id="Elastic-Load-Balancing"><a href="#Elastic-Load-Balancing" class="headerlink" title="Elastic Load Balancing"></a>Elastic Load Balancing</h2><p><a href="http://docs.aws.amazon.com/zh_cn/elasticloadbalancing/latest/userguide/what-is-load-balancing.html" target="_blank" rel="noopener">简介</a></p>
+<p><a href="http://docs.aws.amazon.com/zh_cn/elasticloadbalancing/latest/userguide/load-balancer-getting-started.html" target="_blank" rel="noopener">入门</a></p>
+<h2 id="Amazon-SQS"><a href="#Amazon-SQS" class="headerlink" title="Amazon SQS"></a>Amazon SQS</h2><p><a href="https://aws.amazon.com/cn/sqs/details/" target="_blank" rel="noopener">简介</a></p>
+<ul>
+<li>标准队列</li>
+</ul>
+<p>标准队列使您能够每秒处理近乎无限数量的事务。标准队列可确保每条消息至少被传送一次。</p>
+<ul>
+<li>FIFO 队列</li>
+</ul>
+<p>这种队列类型最重要的功能是 FIFO (先进先出) 传送和一次性处理：让消息的发送顺序和接收顺序严格保持一致，且消息只传送一次并保留到用户将其处理和删除；重复的消息不会被引入队列。FIFO 队列还支持消息组，即允许在单个队列中传送多个有序流。FIFO 队列仅限 300 笔交易/秒 (TPS)，但具有标准队列的所有功能。</p>
+<ul>
+<li>特点</li>
+</ul>
+<p>消息可以在队列中最多保留 14 天。</p>
+<p>开发人员可以创建任意数量的 Amazon SQS 队列，队列可包含无限数量的消息。</p>
+<a id="more"></a>
+<ul>
+<li>价格</li>
+</ul>
+<p><a href="https://aws.amazon.com/cn/sqs/pricing/" target="_blank" rel="noopener">计费</a></p>
+<p>Amazon SQS 请求定价<br>    标准队列<br>    0.40 USD (每个请求 0.00000040 USD)<br>    FIFO 队列<br>    0.50 USD (每个请求 0.00000050 USD)</p>
+<p>Amazon SQS 数据传输定价</p>
+<ul>
+<li>开发</li>
+</ul>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AWSSimpleQueueService/latest/SQSDeveloperGuide/Welcome.html" target="_blank" rel="noopener">DOC</a></p>
+<p><a href="https://docs.aws.amazon.com/sdk-for-net/v3/developer-guide/sqs-apis-intro.html" target="_blank" rel="noopener">Code Examples</a></p>
+<h2 id="Amazon-CloudFront"><a href="#Amazon-CloudFront" class="headerlink" title="Amazon CloudFront"></a>Amazon CloudFront</h2><ul>
+<li>CDN</li>
+</ul>
+<h2 id="Amazon-ElastiCache-分布式缓存"><a href="#Amazon-ElastiCache-分布式缓存" class="headerlink" title="Amazon ElastiCache  分布式缓存"></a>Amazon ElastiCache  分布式缓存</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonElastiCache/latest/UserGuide/WhatIs.html" target="_blank" rel="noopener">文档</a></p>
+<h2 id="VPC"><a href="#VPC" class="headerlink" title="VPC"></a>VPC</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Introduction.html?shortFooter=true" target="_blank" rel="noopener">什么是VPC</a></p>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/GettingStartedGuide/ExerciseOverview.html" target="_blank" rel="noopener">vpc 文档</a></p>
+<ul>
+<li>它在逻辑上与 AWS 云中的其他虚拟网络隔绝。可在 VPC 中启动 AWS 资源</li>
+</ul>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Subnets.html?shortFooter=true#vpc-subnet-basics" target="_blank" rel="noopener">VPC和子网</a></p>
+<ul>
+<li>每个子网都必须关联一个路由表，这个路由表可指定允许出站流量离开子网的可用路由。您创建的每个子网都会自动关联 VPC 的主路由表。</li>
+</ul>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html?shortFooter=true#Add_IGW_Attach_Gateway" target="_blank" rel="noopener">Internet 网关</a></p>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Route_Tables.html?shortFooter=true" target="_blank" rel="noopener">路由表</a></p>
+<ul>
+<li>在您的 VPC 中的每个子网必须与一个路由表关联；路由表控制子网的路由。一个子网一次只能与一个路由表关联，但您可以将多个子网与同一路由表关联。</li>
+</ul>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html?shortFooter=true" target="_blank" rel="noopener">安全组</a></p>
+<h2 id="Amazon-CloudWatch"><a href="#Amazon-CloudWatch" class="headerlink" title="Amazon CloudWatch"></a>Amazon CloudWatch</h2><p><a href="https://docs.amazonaws.cn/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html" target="_blank" rel="noopener">创建报警</a></p>
+]]></content>
+      
+        <categories>
+            
+            <category> AWS </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> RDS Others </tag>
             
         </tags>
         
@@ -1483,29 +1483,6 @@ port=0;
     </entry>
     
     <entry>
-      <title><![CDATA[identityserver]]></title>
-      <url>http://ccccccmd.rootu.cn/2017/01/12/identityserver/</url>
-      <content type="html"><![CDATA[<p>center identityserver</p>
-<p>api IdentityServer4.AccessTokenValidation</p>
-<p>client identity.model</p>
-]]></content>
-      
-        <categories>
-            
-            <category> C# </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> C# </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[ABP and Angular]]></title>
       <url>http://ccccccmd.rootu.cn/2017/01/12/abp-angular/</url>
       <content type="html"><![CDATA[<ul>
@@ -1542,6 +1519,29 @@ port=0;
         <tags>
             
             <tag> ABP </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[identityserver]]></title>
+      <url>http://ccccccmd.rootu.cn/2017/01/12/identityserver/</url>
+      <content type="html"><![CDATA[<p>center identityserver</p>
+<p>api IdentityServer4.AccessTokenValidation</p>
+<p>client identity.model</p>
+]]></content>
+      
+        <categories>
+            
+            <category> C# </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> C# </tag>
             
         </tags>
         
