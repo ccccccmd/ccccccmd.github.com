@@ -204,6 +204,90 @@
 </nav>
       <div class="body-wrap">
   
+    <article id="post-abp-angular" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/01/12/abp-angular/" class="article-date">
+      <time datetime="2017-01-12T15:04:54.000Z" itemprop="datePublished">2017-01-12</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/01/12/abp-angular/">ABP and Angular</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <ul>
+<li><p>下载 abp angular 项目模板<br>先装yarn<br>然后yarn install<br>npm start<br>ng serve</p>
+</li>
+<li><p>菜单配置 在layout/sidebar-nav.component.ts</p>
+</li>
+<li><p>然后在客户端运行nswag / refresh.bat文件以重新生成服务代理类（它们用于调用服务器端服务方法）。</p>
+</li>
+<li><p>service-proxy.module.ts  添加   ApiServiceProxies.LotteryServiceProxy</p>
+</li>
+</ul>
+<p>更换语言</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app.module.ts</span><br><span class="line">import localeZhHans from <span class="string">'@angular/common/locales/zh-Hans'</span>;</span><br><span class="line">import &#123; registerLocaleData &#125; from <span class="string">'@angular/common'</span>;</span><br><span class="line">registerLocaleData(localeZhHans);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>组件，指定都用要用angular-cli生成，需要注意修改：</li>
+</ul>
+<p>子组件的selector</p>
+<p>form 的id</p>
+<ul>
+<li>代码生成器生成的字段_id要去掉</li>
+</ul>
+<p>指令写法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import &#123; Directive, Input, ElementRef, OnInit &#125; from <span class="string">'@angular/core'</span>;</span><br><span class="line">import moment from <span class="string">'moment'</span>;</span><br><span class="line"></span><br><span class="line">@Directive(&#123;</span><br><span class="line">    selector: <span class="string">'[cnode-from-now]'</span> // Attribute selector</span><br><span class="line">&#125;)</span><br><span class="line"><span class="built_in">export</span> class CnodeFromNowDirective implements OnInit &#123;</span><br><span class="line"></span><br><span class="line">    @Input(<span class="string">'cnode-from-now'</span>) dateTime: Date;</span><br><span class="line">    constructor(private ele: ElementRef) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    ngOnInit(): void &#123;</span><br><span class="line">        (&lt;HTMLElement&gt;this.ele.nativeElement).innerText = moment(this.dateTime).locale(<span class="string">'zh-cn'</span>).fromNow();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/ABP/">ABP</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ABP/">ABP</a></li></ul>
+    </div>
+
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
+  
     <article id="post-identityserver" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
@@ -269,11 +353,11 @@
 
 
   
-    <article id="post-docker" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-表达式树-一" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2017/01/12/docker/" class="article-date">
-      <time datetime="2017-01-12T15:04:54.000Z" itemprop="datePublished">2017-01-12</time>
+      <a href="/2017/01/02/表达式树-一/" class="article-date">
+      <time datetime="2017-01-02T15:04:54.000Z" itemprop="datePublished">2017-01-02</time>
 </a>
     </div>
   
@@ -286,7 +370,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/01/12/docker/">Docker</a>
+      <a class="article-title" href="/2017/01/02/表达式树-一/">表达式树(一)</a>
     </h1>
   
 
@@ -296,54 +380,14 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-              <h2 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h2><ul>
-<li>docker的安装</li>
-</ul>
-<p><a href="https://yeasy.gitbooks.io/docker_practice/content/install/centos.html" target="_blank" rel="noopener">https://yeasy.gitbooks.io/docker_practice/content/install/centos.html</a></p>
-<p>systemctl enable docker</p>
-<p>usermod -aG docker $USER</p>
-<p>systemctl start docker</p>
-<p>docker run hello-world</p>
-<ul>
-<li>镜像加速器</li>
-</ul>
-<p>/etc/docker/daemon.json 中写入如下内容（如果文件不存在请新建该文件）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"registry-mirrors"</span>: [</span><br><span class="line">    <span class="string">"https://registry.docker-cn.com"</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>$ sudo systemctl daemon-reload<br>$ sudo systemctl restart docker</p>
-<p><a href="http://www.ruanyifeng.com/blog/2018/02/docker-tutorial.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2018/02/docker-tutorial.html</a></p>
-<ul>
-<li>安装 docker-compose   </li>
-</ul>
-<p>sudo curl -L <a href="https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$" target="_blank" rel="noopener">https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$</a>(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose</p>
-<p>chmod +x /usr/local/bin/docker-compose</p>
-<p>docker-compose –version</p>
-<ul>
-<li>depends_on 和 links 区别</li>
-</ul>
-<p><a href="https://stackoverflow.com/questions/35832095/difference-between-links-and-depends-on-in-docker-compose-yml" target="_blank" rel="noopener">https://stackoverflow.com/questions/35832095/difference-between-links-and-depends-on-in-docker-compose-yml</a></p>
-<p><a href="http://einverne.github.io/post/2018/03/docker-compose-links-vs-depends-on-differences.html" target="_blank" rel="noopener">http://einverne.github.io/post/2018/03/docker-compose-links-vs-depends-on-differences.html</a></p>
-<ul>
-<li>在后台启动并运行所有的容器</li>
-</ul>
-<p>docker-compose up -d</p>
-<p>docker container ls</p>
-<p>docker container logs</p>
-<p>docker-compose logs<br>docker-compose ps</p>
-<p>docker container exec -it 334762bf6ca7 /bin/bash</p>
-<p>docker-compose ps –services</p>
-<ul>
-<li>基于内核虚拟化技术  KVM 硬件虚拟化</li>
-</ul>
-<p><code>yum install docker</code></p>
-<p><code>docker pull centos</code></p>
-<p><code>docker images</code></p>
-<p><code>docker save centos &gt; /home/centos.tar.gz</code></p>
-<p><code>docker load &lt; /home/centos.tar.gz</code></p>
-<p><code>docker run -name ccccccmd -t -i centos /bin/bash</code></p>
-<p><code>docker ps -a</code></p>
-<p><code>docker start containerid</code></p>
-<p><code>docker attach</code>  重新进入</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker inspect --format <span class="string">"&#123;&#123;.State.Pid&#125;&#125; containerid"</span>`</span><br></pre></td></tr></table></figure>
-<p><code>nsenter -t pid -i -u -p -n</code></p>
+              <p>用最原始的方式构造表达式树：</p>
+<p><code>1.-a</code>:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ParameterExpression expDoubleA = Expression.Parameter(typeof(double), <span class="string">"a"</span>);</span><br><span class="line">UnaryExpression unaryExp = Expression.Negate(expDoubleA);</span><br><span class="line">Console.WriteLine(unaryExp.ToString());</span><br></pre></td></tr></table></figure></p>
+<p><code>2.a+b*2</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ParameterExpression expDoubleB = Expression.Parameter(typeof(double), <span class="string">"b"</span>);</span><br><span class="line">BinaryExpression exp2MuliplyB = Expression.Multiply(expDoubleB, Expression.Constant(2.0));</span><br><span class="line">BinaryExpression aAdd2MultiplyB = Expression.Add(expDoubleA, exp2MuliplyB);</span><br><span class="line">Console.WriteLine(aAdd2MultiplyB.ToString());</span><br></pre></td></tr></table></figure>
+<p><code>3.Math.Sin(a) + Math.Cos(b)</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MethodCallExpression m1 = Expression.Call(null, typeof(Math).GetMethod(<span class="string">"Sin"</span>, BindingFlags.Public | BindingFlags.Static), expDoubleA);</span><br><span class="line">MethodCallExpression m2 = Expression.Call(null, typeof(Math).GetMethod(<span class="string">"Cos"</span>, BindingFlags.Public | BindingFlags.Static), expDoubleB);</span><br><span class="line">BinaryExpression sinAddCos = Expression.Add(m1, m2);</span><br><span class="line">Console.WriteLine(sinAddCos.ToString());</span><br></pre></td></tr></table></figure>
+<p><code>4.new StringBuilder(“Hello”)</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">NewExpression newExp = Expression.New(typeof(StringBuilder)</span><br><span class="line">.GetConstructor(new Type[] &#123; typeof(string) &#125;),</span><br><span class="line"> Expression.Constant(<span class="string">"hello"</span>));</span><br><span class="line">Console.WriteLine(newExp.ToString());</span><br></pre></td></tr></table></figure>
           
       
       
@@ -353,18 +397,18 @@
       
       
     <div class="article-category tagcloud">
-    <a class="article-category-link" href="/categories/Docker/">Docker</a>
+    <a class="article-category-link" href="/categories/Expression-Tree/">Expression Tree</a>
     </div>
 
 
       
     <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Docker/">Docker</a></li></ul>
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Expression-Tree/">Expression Tree</a></li></ul>
     </div>
 
       
         <p class="article-more-link">
-          <a  href="/2017/01/12/docker/#more">探索 >></a>
+          <a  href="/2017/01/02/表达式树-一/#more">探索 >></a>
         </p>
       
       <div class="clearfix"></div>
@@ -469,80 +513,6 @@
 
 
   
-    <article id="post-表达式树-一" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2017/01/02/表达式树-一/" class="article-date">
-      <time datetime="2017-01-02T15:04:54.000Z" itemprop="datePublished">2017-01-02</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/01/02/表达式树-一/">表达式树(一)</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <p>用最原始的方式构造表达式树：</p>
-<p><code>1.-a</code>:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ParameterExpression expDoubleA = Expression.Parameter(typeof(double), <span class="string">"a"</span>);</span><br><span class="line">UnaryExpression unaryExp = Expression.Negate(expDoubleA);</span><br><span class="line">Console.WriteLine(unaryExp.ToString());</span><br></pre></td></tr></table></figure></p>
-<p><code>2.a+b*2</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ParameterExpression expDoubleB = Expression.Parameter(typeof(double), <span class="string">"b"</span>);</span><br><span class="line">BinaryExpression exp2MuliplyB = Expression.Multiply(expDoubleB, Expression.Constant(2.0));</span><br><span class="line">BinaryExpression aAdd2MultiplyB = Expression.Add(expDoubleA, exp2MuliplyB);</span><br><span class="line">Console.WriteLine(aAdd2MultiplyB.ToString());</span><br></pre></td></tr></table></figure>
-<p><code>3.Math.Sin(a) + Math.Cos(b)</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MethodCallExpression m1 = Expression.Call(null, typeof(Math).GetMethod(<span class="string">"Sin"</span>, BindingFlags.Public | BindingFlags.Static), expDoubleA);</span><br><span class="line">MethodCallExpression m2 = Expression.Call(null, typeof(Math).GetMethod(<span class="string">"Cos"</span>, BindingFlags.Public | BindingFlags.Static), expDoubleB);</span><br><span class="line">BinaryExpression sinAddCos = Expression.Add(m1, m2);</span><br><span class="line">Console.WriteLine(sinAddCos.ToString());</span><br></pre></td></tr></table></figure>
-<p><code>4.new StringBuilder(“Hello”)</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">NewExpression newExp = Expression.New(typeof(StringBuilder)</span><br><span class="line">.GetConstructor(new Type[] &#123; typeof(string) &#125;),</span><br><span class="line"> Expression.Constant(<span class="string">"hello"</span>));</span><br><span class="line">Console.WriteLine(newExp.ToString());</span><br></pre></td></tr></table></figure>
-          
-      
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-    <div class="article-category tagcloud">
-    <a class="article-category-link" href="/categories/Expression-Tree/">Expression Tree</a>
-    </div>
-
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Expression-Tree/">Expression Tree</a></li></ul>
-    </div>
-
-      
-        <p class="article-more-link">
-          <a  href="/2017/01/02/表达式树-一/#more">探索 >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
     <article id="post-微信支付" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
@@ -628,33 +598,13 @@
     <div class="outer">
         <div id="footer-info">
             <div class="footer-left">
-                &copy; 2018 ccccccmd
+                &copy; 2019 ccccccmd
             </div>
             <div class="footer-right">
                 <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> 
 				<p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
             </div>
         </div>
-        
-            <div class="visit">
-                
-                    <span id="busuanzi_container_site_pv" style='display:none'>
-                        <span id="site-visit" >到访数: 
-                            <span id="busuanzi_value_site_uv"></span>
-                        </span>
-                    </span>
-                
-                
-                    <span>, </span>
-                
-                
-                    <span id="busuanzi_container_page_pv" style='display:none'>
-                        <span id="page-visit">本页阅读量: 
-                            <span id="busuanzi_value_page_pv"></span>
-                        </span>
-                    </span>
-                
-            </div>
         
     </div>
 </footer>
@@ -689,8 +639,8 @@
     })
 </script>
 
-<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-</script>
+<!-- <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script> -->
 
   <script language="javascript">
     $(function() {
