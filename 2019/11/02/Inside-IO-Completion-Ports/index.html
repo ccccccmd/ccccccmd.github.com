@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Inside I/O Completion Ports（翻译） | 403</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="介绍编写高性能服务端应用程序需要实现高效的线程模型。处理客户端请求的服务器线程太少或太多，都可能会导致性能问题。例如，如果服务器创建一个线程来处理所有请求，则客户端不得不去排队等待，因为服务器一次只能处理一个请求。当然，单个线程可以同时处理多个请求，如在进行I/O操作时从一个请求切换到另一个请求，但是这种体系结构带来了极大的复杂性，无法利用多处理器系统。 在另一种极端情况下，服务器可能会创建大量线">
+<meta name="keywords" content="CLR">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Inside I&#x2F;O Completion Ports（翻译）">
+<meta property="og:url" content="http://ccccccmd.rootu.cn/2019/11/02/Inside-IO-Completion-Ports/index.html">
+<meta property="og:site_name" content="403">
+<meta property="og:description" content="介绍编写高性能服务端应用程序需要实现高效的线程模型。处理客户端请求的服务器线程太少或太多，都可能会导致性能问题。例如，如果服务器创建一个线程来处理所有请求，则客户端不得不去排队等待，因为服务器一次只能处理一个请求。当然，单个线程可以同时处理多个请求，如在进行I/O操作时从一个请求切换到另一个请求，但是这种体系结构带来了极大的复杂性，无法利用多处理器系统。 在另一种极端情况下，服务器可能会创建大量线">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://ccccccmd.rootu.cn/img/IoCompletionPorts.gif">
+<meta property="og:updated_time" content="2019-11-07T07:14:47.585Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Inside I&#x2F;O Completion Ports（翻译）">
+<meta name="twitter:description" content="介绍编写高性能服务端应用程序需要实现高效的线程模型。处理客户端请求的服务器线程太少或太多，都可能会导致性能问题。例如，如果服务器创建一个线程来处理所有请求，则客户端不得不去排队等待，因为服务器一次只能处理一个请求。当然，单个线程可以同时处理多个请求，如在进行I/O操作时从一个请求切换到另一个请求，但是这种体系结构带来了极大的复杂性，无法利用多处理器系统。 在另一种极端情况下，服务器可能会创建大量线">
+<meta name="twitter:image" content="http://ccccccmd.rootu.cn/img/IoCompletionPorts.gif">
+  
+    <link rel="alternative" href="/atom.xml" title="403" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.png" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">ccccccmd</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Net-Core/" style="font-size: 15px;">.Net Core</a> <a href="/tags/ABP/" style="font-size: 15px;">ABP</a> <a href="/tags/Asp-net-Core/" style="font-size: 10px;">Asp.net Core</a> <a href="/tags/Autofac/" style="font-size: 15px;">Autofac</a> <a href="/tags/Blog/" style="font-size: 10px;">Blog</a> <a href="/tags/C/" style="font-size: 10px;">C#</a> <a href="/tags/CLR/" style="font-size: 10px;">CLR</a> <a href="/tags/Cqrs/" style="font-size: 10px;">Cqrs</a> <a href="/tags/DDD/" style="font-size: 10px;">DDD</a> <a href="/tags/DataTracking/" style="font-size: 10px;">DataTracking</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/EF/" style="font-size: 20px;">EF</a> <a href="/tags/Event-Bus/" style="font-size: 10px;">Event Bus</a> <a href="/tags/Exceptionless/" style="font-size: 10px;">Exceptionless</a> <a href="/tags/Expression-Tree/" style="font-size: 10px;">Expression Tree</a> <a href="/tags/FluentAPI/" style="font-size: 10px;">FluentAPI</a> <a href="/tags/Ghost/" style="font-size: 10px;">Ghost</a> <a href="/tags/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/IIS/" style="font-size: 10px;">IIS</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Local-Data/" style="font-size: 10px;">Local Data</a> <a href="/tags/MediatR/" style="font-size: 10px;">MediatR</a> <a href="/tags/MiniProfiler/" style="font-size: 10px;">MiniProfiler</a> <a href="/tags/ModelFirst/" style="font-size: 10px;">ModelFirst</a> <a href="/tags/PHP入门/" style="font-size: 10px;">PHP入门</a> <a href="/tags/POCO/" style="font-size: 10px;">POCO</a> <a href="/tags/Proxy/" style="font-size: 10px;">Proxy</a> <a href="/tags/Quartz-Net/" style="font-size: 10px;">Quartz.Net</a> <a href="/tags/RDS/" style="font-size: 10px;">RDS</a> <a href="/tags/RDS-Others/" style="font-size: 10px;">RDS Others</a> <a href="/tags/S3/" style="font-size: 10px;">S3</a> <a href="/tags/TYK/" style="font-size: 10px;">TYK</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/angular-js/" style="font-size: 10px;">angular.js</a> <a href="/tags/async/" style="font-size: 10px;">async</a> <a href="/tags/cqrs/" style="font-size: 10px;">cqrs</a> <a href="/tags/distributed-lock/" style="font-size: 10px;">distributed lock</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/hangfire/" style="font-size: 10px;">hangfire</a> <a href="/tags/kibana/" style="font-size: 10px;">kibana</a> <a href="/tags/masstransit/" style="font-size: 10px;">masstransit</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/serilog/" style="font-size: 10px;">serilog</a> <a href="/tags/webclient/" style="font-size: 10px;">webclient</a> <a href="/tags/wordpress/" style="font-size: 10px;">wordpress</a> <a href="/tags/任务调度/" style="font-size: 10px;">任务调度</a> <a href="/tags/分布式锁/" style="font-size: 10px;">分布式锁</a> <a href="/tags/微信支付/" style="font-size: 10px;">微信支付</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://www.rootu.cn">Backup</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">ccccccmd</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.png" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">ccccccmd</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">以大多数人的努力程度之低，根本轮不上拼天赋</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="mailto:admin@rootu.cn" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/ccccccmd" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="http://www.cnblogs.com/cnduan" title="zhihu">zhihu</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Inside-IO-Completion-Ports" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2019/11/02/Inside-IO-Completion-Ports/" class="article-date">
+      <time datetime="2019-11-02T05:10:28.000Z" itemprop="datePublished">2019-11-02</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Inside I/O Completion Ports（翻译）
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/CLR/">CLR</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CLR/">CLR</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>编写高性能服务端应用程序需要实现高效的线程模型。处理客户端请求的服务器线程太少或太多，都可能会导致性能问题。例如，如果服务器创建一个线程来处理所有请求，则客户端不得不去排队等待，因为服务器一次只能处理一个请求。当然，单个线程可以同时处理多个请求，如在进行I/O操作时从一个请求切换到另一个请求，但是这种体系结构带来了极大的复杂性，无法利用多处理器系统。</p>
+<p>在另一种极端情况下，服务器可能会创建大量线程，因此实际上每个客户端请求都由专用线程处理。这种情况通常会导致线程浪费，表现为大量的线程被唤醒，执行一些CPU处理，然后阻塞等待I/O，然后在完成请求处理后再次阻止等待新请求。除此之外，调度程序必须在多个活动线程之间分配处理器时间，还会造成频繁的上下文切换。</p>
+<p>咱们的目的是通过使服务器的线程避免不必要的阻塞来尽可能减少上下文切换，同时通过使用多个线程来最大程度地提高并行度。理想的情况是，每个处理器上有有一个线程主动处理客户端请求，并且对于这些线程，如果在完成请求时还有其他请求在等待，则这些线程不会阻塞。但是，要使其正常工作，必须有一种方法可以使应用程序在一个客户端请求的处理在I/O上阻塞时（例如，在处理过程中从文件中读取时）激活另一个线程。</p>
+<p><code>Windows NT 3.5</code>引入了一组API，使此目标相对容易实现。这些API以叫做<code>completion port</code>的对象为中心。在本文中，我将概述如何使用<code>completion ports</code>，然后深入了解它们，以向您展示Windows NT如何实现它们。</p>
+<a id="more"></a>
+<h2 id="使用I-O-Completion-Ports"><a href="#使用I-O-Completion-Ports" class="headerlink" title="使用I/O Completion Ports"></a>使用I/O Completion Ports</h2><p>应用程序使用<code>Completion Ports</code>作为完成与多个文件句柄关联的I/O的关注点。一旦文件与<code>Completion Ports</code>相关联，在文件上完成的所有异步I/O操作都会导致<code>completion packet</code>排队到该端口。一个线程只需简单地等待在<code>Completion Ports</code>上排队的<code>completion packet</code>，就可以wait多个文件上任何未完成的I/O。Win32 API提供了与WaitForMultipleObjects API 类似的功能，但是<code>Completion Ports</code>具有的优点是并发数或应用程序主动服务于客户端请求的线程数是借助系统来控制的。</p>
+<p>当应用程序创建<code>Completion Ports</code>时，它将指定并发值。此值指示在任何给定的时间点可以与该<code>Port</code>关联的最大线程数。如前所述，理想的做法是在任何给定的时间点为系统中的每个处理器激活一个线程。NT使用与端口关联的并发值来控制应用程序有多少个活动线程-如果与端口关联的活动线程数等于并发值，则不允许等待这个在<code>Completion Ports</code>的线程运行。取而代之的是，预期活动线程中的一个将完成对当前请求的处理，并检查端口上是否还有另一个数据包在等待-如果存在，则它简单地抓取它并去处理它。发生这种情况时，就不会进行上下文切换。</p>
+<p>下面的图1显示了<code>Completion Ports</code>操作的高级视图。传入的客户端请求导致完成数据包在端口排队。NT允许许多线程（最多端口的并发限制）来处理客户端请求。与活动端口相关联的所有其他线程都将被阻塞，直到活动线程数量下降为止，这在文件I/O上的活动线程阻塞时会发生。我稍后再讨论。</p>
+<p><img src="/img/IoCompletionPorts.gif" alt="iocp"></p>
+<p>通过调用Win32 API CreateIoCompletionPort创建<code>Completion Ports</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">HANDLE CreateIoCompletionPort(</span><br><span class="line">    HANDLE FileHandle,</span><br><span class="line">    HANDLE ExistingCompletionPort,</span><br><span class="line">    DWORD CompletionKey,</span><br><span class="line">    DWORD NumberOfConcurrentThreads</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>要创建端口，应用程序会将ExistingCompletionPort参数传递为NULL，并使用NumberOfConcurrentThreads参数指示并发值。如果指定了FileHandle参数，则文件句柄将与端口关联。当在文件句柄上发出的I/O请求完成时，完成包将排队到<code>Completion Ports</code>。要检索完成包并可能阻塞等待一个线程到达的线程，请调用GetQueuedCompletionStatus API：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">BOOL GetQueuedCompletionStatus（</span><br><span class="line">     HANDLE  CompletionPort，</span><br><span class="line">     LPDWORD  lpNumberOfBytesTransferred，</span><br><span class="line">     LPDWORD  CompletionKey，</span><br><span class="line">     LPOVERLAPPED  * lpOverlapped，</span><br><span class="line">     DWORD  dwMiillisecondTimeout </span><br><span class="line">）;</span><br></pre></td></tr></table></figure>
+<p>在<code>Completion Ports</code>上阻塞的线程将与该端口关联，并以LIFO顺序唤醒，因此最近阻塞的线程将被分配给下一个数据包。长时间阻塞的线程可以将其堆栈换出到磁盘，因此，如果与端口关联的线程更多，则可以进行工作以处理阻塞时间最长的线程的内存占用量。</p>
+<p>服务器应用程序通常将通过表示为文件句柄的网络端点接收客户端请求。示例包括Winsock2套接字或命名管道。当服务器创建其通信终结点时，它将它们与<code>Completion Ports</code>关联，并且其线程通过调用GetQueuedCompletionStatus等待传入的请求在港口上。当从<code>Completion Ports</code>为线程提供数据包时，它将关闭并开始处理请求，成为活动线程。线程在其处理期间会阻塞很多次，例如何时需要将数据读取或写入磁盘上的文件，或者何时与其他线程同步。Windows NT足够聪明，可以检测到这一点并认识到<code>Completion Ports</code>有一个较少活动的线程。因此，当线程由于阻塞而变得不活动时，如果队列中有数据包，则等待<code>Completion Ports</code>的线程将被唤醒。</p>
+<p>Microsoft的准则是将并发值设置为大致等于系统中的处理器数量。请注意，<code>Completion Ports</code>的活动线程数有可能超过并发限制。考虑将限制指定为1的情况。客户端请求进入并且调度了一个线程来处理该请求，该线程变为活动状态。第二个请求进入，但由于已达到并发限制，不允许等待端口的第二个线程继续进行。然后，第一个线程阻塞以等待文件I/O，因此它变为非活动状态。然后释放第二个线程，当它仍处于活动状态时，第一个线程的文件I/O完成，使其再次处于活动状态。在那个时间点，直到其中一个线程阻塞，并发值为2，高于限制1。</p>
+<p><code>Completion Ports</code>API还使服务器应用程序可以使用PostQueuedCompletionStatus将私有定义的完成数据包排队到<code>Completion Ports</code>。服务器通常使用此功能通知其线程外部事件，例如需要正常关闭的事件。</p>
+<h2 id="IOCP内部实现"><a href="#IOCP内部实现" class="headerlink" title="IOCP内部实现"></a>IOCP内部实现</h2><p>使用NULL<code>Completion Ports</code>句柄 调用Win32 API CreateIoCompletionPort会导致执行本机API函数NtCreateIoCompletion，它调用相同名称的相应内核模式系统服务。在内部，<code>Completion Ports</code>基于称为Queue的未记录的执行同步对象。因此，系统服务在端口分配的内存中创建<code>Completion Ports</code>对象并初始化队列对象（由于队列位于端口内存的开头，因此指向该端口的指针也指向该队列对象）。队列对象具有（偶然地）在线程初始化一个线程时指定的并发值，在这种情况下，使用的值是传递给CreateIoCompletionPort的值。KeInitializeQueue是NtCreateIoCompletion的函数 调用以初始化端口的队列对象。</p>
+<p>当应用程序调用CreateIoCompletionPort将文件句柄与端口相关联时，Win32 API会以文件句柄作为主要参数调用本机函数NtSetInformationFile。设置的信息类为FileCompletionInformation，而<code>Completion Ports</code>的句柄和CreateIoCompletionPort的CompletionKey参数 为数据值。NtSetInformationFile取消引用文件句柄以获得文件对象并分配一个完成上下文数据结构，该结构在NTDDK.H中定义为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">typedef struct _IO_COMPLETION_CONTEXT &#123;</span><br><span class="line">    PVOID Port; </span><br><span class="line">    ULONG Key; </span><br><span class="line">&#125; IO_COMPLETION_CONTEXT, *PIO_COMPLETION_CONTEXT;</span><br></pre></td></tr></table></figure>
+<p>最后，NtSetInformationFile将文件对象中的CompletionContext字段设置为指向上下文结构。当对文件对象完成I/O操作时，将执行内部I/O管理器功能IopCompleteRequest，如果I/O是异步的，则检查文件对象中的CompletionContext字段是否为非NULL。如果它的非NULL，则I/O管理器通过调用KeInsertQueue并将完成的数据包排队到<code>Completion Ports</code>，并将端口作为插入数据包的队列（请注意，<code>Completion Ports</code>对象和队列对象是同义的）。</p>
+<p>当服务器线程调用GetQueuedCompletionStatus时，它将调用本机API函数NtRemoveIoCompletion，该函数将控制权转移到NtRemoveIoCompletion系统服务。验证参数并将<code>Completion Ports</code>句柄转换为指向该端口的指针后，NtRemoveIoCompletion调用KeRemoveQueue。</p>
+<p>如您所见，KeRemoveQueue和KeInsertQueue是<code>Completion Ports</code>后面的引擎，是确定是否应激活等待I/O完成数据包的线程的功能。在内部，队列对象维护当前活动线程数和最大活动线程数。如果当线程调用KeRemoveQueue时当前数量等于或超过最大值，则该线程将（按LIFO顺序）放入线程列表中，等待轮流处理完成数据包。线程列表挂在队列对象之外。线程的控制块数据结构中有一个指针，该指针引用与其关联的队列的队列对象。如果指针为NULL，则线程不与队列关联。</p>
+<p>那么NT如何跟踪那些由于阻塞而不是<code>Completion Ports</code>而变为非活动状态的线程？答案在于线程控制块中的队列指针。为响应线程阻塞而执行的调度程序例程（KeWaitForSingleObject，KeDelayExecutionThread等）将检查线程的队列指针，如果其不为NULL，则它们将调用与队列相关的函数KiActivateWaiterQueue。KiActivateWaiterQueue减少与队列关联的活动线程的数量，如果结果小于最大值，并且队列中至少有一个完成数据包，则唤醒队列线程列表前面的线程，并给出最早的数据包。相反，只要阻止调度程序后与队列关联的线程醒来，就会执行KiUnwaitThread函数，该函数会增加队列的活动计数。</p>
+<p>最后，PostQueuedCompletionStatus的Win32 API呼吁本地函数NtSetIoCompletion。与<code>Completion Ports</code>组中的其他本机API一样，此调用一个具有相同名称的系统服务，该服务使用KeInsertQueue将该数据包简单地插入到<code>Completion Ports</code>的队列中。</p>
+<p>Windows NT的<code>Completion Ports</code>API提供了一种易于使用且有效的方式，通过在获得高度并行性的同时使上下文切换最小化来最大化服务器的性能。通过I/O管理器，内核和系统服务的支持，使该API成为可能。导出队列对象以供设备驱动程序使用（该对象未记录，但其接口相对容易找出），而<code>Completion Ports</code>API则不是。但是，如果派生了队列接口，则可以简单地使用队列例程来模仿<code>Completion Ports</code>接口，并通过设置CompletionContext条目将文件对象与队列手动关联。</p>
+<p><a href="http://sysinternals.d4rk4.ru/Information/IoCompletionPorts.html" target="_blank" rel="noopener">原文链接</a><br>版权所有©1998 Mark Russinovich </p>
+
+      
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2019/11/02/Inside-IO-Completion-Ports/">Inside I/O Completion Ports（翻译）</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 ccccccmd 的个人博客">ccccccmd</a></p>
+        <p><span>发布时间:</span>2019年11月02日 - 13时10分</p>
+        <p><span>最后更新:</span>2019年11月07日 - 15时14分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2019/11/02/Inside-IO-Completion-Ports/" title="Inside I/O Completion Ports（翻译）">http://ccccccmd.rootu.cn/2019/11/02/Inside-IO-Completion-Ports/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://ccccccmd.rootu.cn/2019/11/02/Inside-IO-Completion-Ports/　　作者: ccccccmd" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+  
+    <a href="/2019/03/22/aspnet-core-serilog-mssql/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">aspnet-core-serilog-mssql</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#介绍"><span class="toc-number">1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用I-O-Completion-Ports"><span class="toc-number">2.</span> <span class="toc-text">使用I/O Completion Ports</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IOCP内部实现"><span class="toc-number">3.</span> <span class="toc-text">IOCP内部实现</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+
+
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2019/03/22/aspnet-core-serilog-mssql/" title="下一篇: aspnet-core-serilog-mssql">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/11/02/Inside-IO-Completion-Ports/">Inside I/O Completion Ports（翻译）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/03/22/aspnet-core-serilog-mssql/">aspnet-core-serilog-mssql</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/04/wordpress-via-docker/">docker-compose 的方式安装 wordpress</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/09/Cachemanager-and-MassTransit-in-asp-net-core/">在asp.net core 中使用Cachemanger、MassTransit和Foundatio分布式锁</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/20/abp-on-linux/">abp core on centos</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/14/iis-net-core/">Asp.net core on IIS</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/07/await-and-async/">await和async</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/EFBulkInsert/">EF中的批量插入</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/mongodb/">mongodb</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/hangfire/">hangfire</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/distributed-lock/">分布式锁Foundatio.Lock</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/cqrs/">使用消息总线 masstransit</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/06/vue/">使用Vue.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/25/rabbitmq/">rabbitmq</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/24/ELK/">ELK</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Net Core On Linux/">.Net Core On Linux</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/Hexo/">Hexo迁移</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/NetCore/">.Net Core 中间件</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/29/tyk/">tyk-gateway</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/04/04/Autofac-二/">Autofac(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/30/CLR/">CLR 总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-RDS/">AWS RDS</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-Others/">AWS 其他产品</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/21/AWS-S3/">AWS S3</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/02/13/autofac/">Autofac(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/16/java-review/">java-review</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/abp-angular/">ABP and Angular</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/identityserver/">identityserver</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/12/docker/">Docker</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/表达式树-一/">表达式树(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/02/探索angular/">angular.js</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/15/微信支付/">微信支付</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/12/01/MiniProfiler/">MiniProfiler</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/cdn-image-cqrs/">cdn-image-cqrs</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/17/webclient-timeout/">webclient-timeout</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/24/EF中的Attach和Entry/">EF中的Attach和Entry</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/16/ghost升级/">Ghost升级</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/15/Exceptionless-本地部署/">Exceptionless 本地部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/03/Quartz-net/">Quartz.net（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/01/mysqlfirst/">mysqlfirst</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/EF的One to Zero,One关系/">EF的One to Zero,One关系</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/17/phpfirst/">PHP</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/03/eftrackingandstate/">EF的实体追踪/动态代理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/02/eflocaldata/">使用EF的本地数据</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/01/EntityFramework/">EF加载实体的三种模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/29/abp-begin/">ABP起步</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/19/ModelFirstInExistDb/">ModelFirstInExistDb</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/18/FluentAPI/">FluentAPI</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/06/11/Heox-博客搭建/">Hexo 博客搭建</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2019 ccccccmd
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> 
+				<p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+            </div>
+        </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 3;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<!-- <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script> -->
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

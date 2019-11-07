@@ -4,6 +4,73 @@
   
     
     <entry>
+      <title><![CDATA[Inside I/O Completion Ports（翻译）]]></title>
+      <url>http://ccccccmd.rootu.cn/2019/11/02/Inside-IO-Completion-Ports/</url>
+      <content type="html"><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>编写高性能服务端应用程序需要实现高效的线程模型。处理客户端请求的服务器线程太少或太多，都可能会导致性能问题。例如，如果服务器创建一个线程来处理所有请求，则客户端不得不去排队等待，因为服务器一次只能处理一个请求。当然，单个线程可以同时处理多个请求，如在进行I/O操作时从一个请求切换到另一个请求，但是这种体系结构带来了极大的复杂性，无法利用多处理器系统。</p>
+<p>在另一种极端情况下，服务器可能会创建大量线程，因此实际上每个客户端请求都由专用线程处理。这种情况通常会导致线程浪费，表现为大量的线程被唤醒，执行一些CPU处理，然后阻塞等待I/O，然后在完成请求处理后再次阻止等待新请求。除此之外，调度程序必须在多个活动线程之间分配处理器时间，还会造成频繁的上下文切换。</p>
+<p>咱们的目的是通过使服务器的线程避免不必要的阻塞来尽可能减少上下文切换，同时通过使用多个线程来最大程度地提高并行度。理想的情况是，每个处理器上有有一个线程主动处理客户端请求，并且对于这些线程，如果在完成请求时还有其他请求在等待，则这些线程不会阻塞。但是，要使其正常工作，必须有一种方法可以使应用程序在一个客户端请求的处理在I/O上阻塞时（例如，在处理过程中从文件中读取时）激活另一个线程。</p>
+<p><code>Windows NT 3.5</code>引入了一组API，使此目标相对容易实现。这些API以叫做<code>completion port</code>的对象为中心。在本文中，我将概述如何使用<code>completion ports</code>，然后深入了解它们，以向您展示Windows NT如何实现它们。</p>
+<a id="more"></a>
+<h2 id="使用I-O-Completion-Ports"><a href="#使用I-O-Completion-Ports" class="headerlink" title="使用I/O Completion Ports"></a>使用I/O Completion Ports</h2><p>应用程序使用<code>Completion Ports</code>作为完成与多个文件句柄关联的I/O的关注点。一旦文件与<code>Completion Ports</code>相关联，在文件上完成的所有异步I/O操作都会导致<code>completion packet</code>排队到该端口。一个线程只需简单地等待在<code>Completion Ports</code>上排队的<code>completion packet</code>，就可以wait多个文件上任何未完成的I/O。Win32 API提供了与WaitForMultipleObjects API 类似的功能，但是<code>Completion Ports</code>具有的优点是并发数或应用程序主动服务于客户端请求的线程数是借助系统来控制的。</p>
+<p>当应用程序创建<code>Completion Ports</code>时，它将指定并发值。此值指示在任何给定的时间点可以与该<code>Port</code>关联的最大线程数。如前所述，理想的做法是在任何给定的时间点为系统中的每个处理器激活一个线程。NT使用与端口关联的并发值来控制应用程序有多少个活动线程-如果与端口关联的活动线程数等于并发值，则不允许等待这个在<code>Completion Ports</code>的线程运行。取而代之的是，预期活动线程中的一个将完成对当前请求的处理，并检查端口上是否还有另一个数据包在等待-如果存在，则它简单地抓取它并去处理它。发生这种情况时，就不会进行上下文切换。</p>
+<p>下面的图1显示了<code>Completion Ports</code>操作的高级视图。传入的客户端请求导致完成数据包在端口排队。NT允许许多线程（最多端口的并发限制）来处理客户端请求。与活动端口相关联的所有其他线程都将被阻塞，直到活动线程数量下降为止，这在文件I/O上的活动线程阻塞时会发生。我稍后再讨论。</p>
+<p><img src="/img/IoCompletionPorts.gif" alt="iocp"></p>
+<p>通过调用Win32 API CreateIoCompletionPort创建<code>Completion Ports</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">HANDLE CreateIoCompletionPort(</span><br><span class="line">    HANDLE FileHandle,</span><br><span class="line">    HANDLE ExistingCompletionPort,</span><br><span class="line">    DWORD CompletionKey,</span><br><span class="line">    DWORD NumberOfConcurrentThreads</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>要创建端口，应用程序会将ExistingCompletionPort参数传递为NULL，并使用NumberOfConcurrentThreads参数指示并发值。如果指定了FileHandle参数，则文件句柄将与端口关联。当在文件句柄上发出的I/O请求完成时，完成包将排队到<code>Completion Ports</code>。要检索完成包并可能阻塞等待一个线程到达的线程，请调用GetQueuedCompletionStatus API：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">BOOL GetQueuedCompletionStatus（</span><br><span class="line">     HANDLE  CompletionPort，</span><br><span class="line">     LPDWORD  lpNumberOfBytesTransferred，</span><br><span class="line">     LPDWORD  CompletionKey，</span><br><span class="line">     LPOVERLAPPED  * lpOverlapped，</span><br><span class="line">     DWORD  dwMiillisecondTimeout </span><br><span class="line">）;</span><br></pre></td></tr></table></figure>
+<p>在<code>Completion Ports</code>上阻塞的线程将与该端口关联，并以LIFO顺序唤醒，因此最近阻塞的线程将被分配给下一个数据包。长时间阻塞的线程可以将其堆栈换出到磁盘，因此，如果与端口关联的线程更多，则可以进行工作以处理阻塞时间最长的线程的内存占用量。</p>
+<p>服务器应用程序通常将通过表示为文件句柄的网络端点接收客户端请求。示例包括Winsock2套接字或命名管道。当服务器创建其通信终结点时，它将它们与<code>Completion Ports</code>关联，并且其线程通过调用GetQueuedCompletionStatus等待传入的请求在港口上。当从<code>Completion Ports</code>为线程提供数据包时，它将关闭并开始处理请求，成为活动线程。线程在其处理期间会阻塞很多次，例如何时需要将数据读取或写入磁盘上的文件，或者何时与其他线程同步。Windows NT足够聪明，可以检测到这一点并认识到<code>Completion Ports</code>有一个较少活动的线程。因此，当线程由于阻塞而变得不活动时，如果队列中有数据包，则等待<code>Completion Ports</code>的线程将被唤醒。</p>
+<p>Microsoft的准则是将并发值设置为大致等于系统中的处理器数量。请注意，<code>Completion Ports</code>的活动线程数有可能超过并发限制。考虑将限制指定为1的情况。客户端请求进入并且调度了一个线程来处理该请求，该线程变为活动状态。第二个请求进入，但由于已达到并发限制，不允许等待端口的第二个线程继续进行。然后，第一个线程阻塞以等待文件I/O，因此它变为非活动状态。然后释放第二个线程，当它仍处于活动状态时，第一个线程的文件I/O完成，使其再次处于活动状态。在那个时间点，直到其中一个线程阻塞，并发值为2，高于限制1。</p>
+<p><code>Completion Ports</code>API还使服务器应用程序可以使用PostQueuedCompletionStatus将私有定义的完成数据包排队到<code>Completion Ports</code>。服务器通常使用此功能通知其线程外部事件，例如需要正常关闭的事件。</p>
+<h2 id="IOCP内部实现"><a href="#IOCP内部实现" class="headerlink" title="IOCP内部实现"></a>IOCP内部实现</h2><p>使用NULL<code>Completion Ports</code>句柄 调用Win32 API CreateIoCompletionPort会导致执行本机API函数NtCreateIoCompletion，它调用相同名称的相应内核模式系统服务。在内部，<code>Completion Ports</code>基于称为Queue的未记录的执行同步对象。因此，系统服务在端口分配的内存中创建<code>Completion Ports</code>对象并初始化队列对象（由于队列位于端口内存的开头，因此指向该端口的指针也指向该队列对象）。队列对象具有（偶然地）在线程初始化一个线程时指定的并发值，在这种情况下，使用的值是传递给CreateIoCompletionPort的值。KeInitializeQueue是NtCreateIoCompletion的函数 调用以初始化端口的队列对象。</p>
+<p>当应用程序调用CreateIoCompletionPort将文件句柄与端口相关联时，Win32 API会以文件句柄作为主要参数调用本机函数NtSetInformationFile。设置的信息类为FileCompletionInformation，而<code>Completion Ports</code>的句柄和CreateIoCompletionPort的CompletionKey参数 为数据值。NtSetInformationFile取消引用文件句柄以获得文件对象并分配一个完成上下文数据结构，该结构在NTDDK.H中定义为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">typedef struct _IO_COMPLETION_CONTEXT &#123;</span><br><span class="line">    PVOID Port; </span><br><span class="line">    ULONG Key; </span><br><span class="line">&#125; IO_COMPLETION_CONTEXT, *PIO_COMPLETION_CONTEXT;</span><br></pre></td></tr></table></figure>
+<p>最后，NtSetInformationFile将文件对象中的CompletionContext字段设置为指向上下文结构。当对文件对象完成I/O操作时，将执行内部I/O管理器功能IopCompleteRequest，如果I/O是异步的，则检查文件对象中的CompletionContext字段是否为非NULL。如果它的非NULL，则I/O管理器通过调用KeInsertQueue并将完成的数据包排队到<code>Completion Ports</code>，并将端口作为插入数据包的队列（请注意，<code>Completion Ports</code>对象和队列对象是同义的）。</p>
+<p>当服务器线程调用GetQueuedCompletionStatus时，它将调用本机API函数NtRemoveIoCompletion，该函数将控制权转移到NtRemoveIoCompletion系统服务。验证参数并将<code>Completion Ports</code>句柄转换为指向该端口的指针后，NtRemoveIoCompletion调用KeRemoveQueue。</p>
+<p>如您所见，KeRemoveQueue和KeInsertQueue是<code>Completion Ports</code>后面的引擎，是确定是否应激活等待I/O完成数据包的线程的功能。在内部，队列对象维护当前活动线程数和最大活动线程数。如果当线程调用KeRemoveQueue时当前数量等于或超过最大值，则该线程将（按LIFO顺序）放入线程列表中，等待轮流处理完成数据包。线程列表挂在队列对象之外。线程的控制块数据结构中有一个指针，该指针引用与其关联的队列的队列对象。如果指针为NULL，则线程不与队列关联。</p>
+<p>那么NT如何跟踪那些由于阻塞而不是<code>Completion Ports</code>而变为非活动状态的线程？答案在于线程控制块中的队列指针。为响应线程阻塞而执行的调度程序例程（KeWaitForSingleObject，KeDelayExecutionThread等）将检查线程的队列指针，如果其不为NULL，则它们将调用与队列相关的函数KiActivateWaiterQueue。KiActivateWaiterQueue减少与队列关联的活动线程的数量，如果结果小于最大值，并且队列中至少有一个完成数据包，则唤醒队列线程列表前面的线程，并给出最早的数据包。相反，只要阻止调度程序后与队列关联的线程醒来，就会执行KiUnwaitThread函数，该函数会增加队列的活动计数。</p>
+<p>最后，PostQueuedCompletionStatus的Win32 API呼吁本地函数NtSetIoCompletion。与<code>Completion Ports</code>组中的其他本机API一样，此调用一个具有相同名称的系统服务，该服务使用KeInsertQueue将该数据包简单地插入到<code>Completion Ports</code>的队列中。</p>
+<p>Windows NT的<code>Completion Ports</code>API提供了一种易于使用且有效的方式，通过在获得高度并行性的同时使上下文切换最小化来最大化服务器的性能。通过I/O管理器，内核和系统服务的支持，使该API成为可能。导出队列对象以供设备驱动程序使用（该对象未记录，但其接口相对容易找出），而<code>Completion Ports</code>API则不是。但是，如果派生了队列接口，则可以简单地使用队列例程来模仿<code>Completion Ports</code>接口，并通过设置CompletionContext条目将文件对象与队列手动关联。</p>
+<p><a href="http://sysinternals.d4rk4.ru/Information/IoCompletionPorts.html" target="_blank" rel="noopener">原文链接</a><br>版权所有©1998 Mark Russinovich </p>
+]]></content>
+      
+        <categories>
+            
+            <category> CLR </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> CLR </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[aspnet-core-serilog-mssql]]></title>
+      <url>http://ccccccmd.rootu.cn/2019/03/22/aspnet-core-serilog-mssql/</url>
+      <content type="html"></content>
+      
+        <categories>
+            
+            <category> serilog </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> serilog </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[docker-compose 的方式安装 wordpress]]></title>
       <url>http://ccccccmd.rootu.cn/2018/08/04/wordpress-via-docker/</url>
       <content type="html"><![CDATA[<h2 id="安装-wordpress"><a href="#安装-wordpress" class="headerlink" title="安装 wordpress"></a>安装 wordpress</h2><p>配置<code>docker-compose.yml</code>,yml再最后。</p>
@@ -837,67 +904,6 @@ port=0;
     </entry>
     
     <entry>
-      <title><![CDATA[tyk-gateway]]></title>
-      <url>http://ccccccmd.rootu.cn/2017/05/29/tyk/</url>
-      <content type="html"><![CDATA[<p>注意，yum源的配置文件前面不要有空格<br><a href="http://dl.fedoraproject.org/pub/epel/7/x86_64/e/" target="_blank" rel="noopener">http://dl.fedoraproject.org/pub/epel/7/x86_64/e/</a></p>
-<ul>
-<li>wget <a href="http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm" target="_blank" rel="noopener">http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm</a></li>
-<li><p>rpm -ivh epel-release-7-9.noarch.rpm</p>
-<p>yum -q makecache -y –disablerepo=’*’ –enablerepo=’tyk_tyk-gateway’ –enablerepo=epel info zabbix</p>
-</li>
-</ul>
-<p>  yum install -y redis tyk-gateway</p>
-<p>  service redis start</p>
-<p>  /opt/tyk-gateway/install/setup.sh –listenport=8080 –redishost=localhost –redisport=6379 –domain=””</p>
-<p>  <a href="https://packagecloud.io/tyk/tyk-gateway" target="_blank" rel="noopener">https://packagecloud.io/tyk/tyk-gateway</a></p>
-<p>  /opt/tyk-dashboard/install/setup.sh –listenport=3000 –redishost=localhost –redisport=6379 –mongo=mongodb://127.0.0.1/tyk_analytics –tyk_api_hostname=$HOSTNAME –tyk_node_hostname=<a href="http://localhost" target="_blank" rel="noopener">http://localhost</a><br>  –tyk_node_port=8080 –portal_root=/portal –domain=”tyk.rootu.cn”</p>
-<p>  sudo service mongod start</p>
-<p>  service tyk-dashboard start</p>
-<p>  ./tyk-analytics –newuser –neworg</p>
-<p>用logrotate分割日志：</p>
-<p>在<code>logrotate.d</code> 中加入tky配置文件</p>
-<pre><code class="bash">/var/<span class="built_in">log</span>/tyk-gateway.stderr {
-    daily 
-    rotate 10
-    copytruncate
-    notifempty
-    missingok
-    create 664 root root
-}
-
-/var/<span class="built_in">log</span>/tyk-dashboard.stderr {
-    daily
-    rotate 10
-    copytruncate
-    notifempty
-    missingok
-    create 664 root root
-}
-
-</code></pre>
-<p><code>sudo logrotate -f /etc/logrotate.conf</code> 及时分割</p>
-<p>/usr/sbin/logrotate -d -f /etc/logrotate.d/tyk-gateway </p>
-<p>sudo systemctl enable tyk-gateway //加入开机启动项</p>
-<p>– 查看开机启动项所在位置 </p>
-<p>/etc/systemd/system/multi-user.target.wants</p>
-]]></content>
-      
-        <categories>
-            
-            <category> Gateway </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> TYK </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[Hexo迁移]]></title>
       <url>http://ccccccmd.rootu.cn/2017/05/29/Hexo/</url>
       <content type="html"><![CDATA[<p>有两台电脑，但不限定在一台电脑上记录东西。下面说说重装电脑时怎么部署这个hexo环境。<br>我的 Hexo 配置文件，主题文件和.md 都存储在 <code>开源中国</code> 的私有仓储里。</p>
@@ -973,6 +979,67 @@ port=0;
     </entry>
     
     <entry>
+      <title><![CDATA[tyk-gateway]]></title>
+      <url>http://ccccccmd.rootu.cn/2017/05/29/tyk/</url>
+      <content type="html"><![CDATA[<p>注意，yum源的配置文件前面不要有空格<br><a href="http://dl.fedoraproject.org/pub/epel/7/x86_64/e/" target="_blank" rel="noopener">http://dl.fedoraproject.org/pub/epel/7/x86_64/e/</a></p>
+<ul>
+<li>wget <a href="http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm" target="_blank" rel="noopener">http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm</a></li>
+<li><p>rpm -ivh epel-release-7-9.noarch.rpm</p>
+<p>yum -q makecache -y –disablerepo=’*’ –enablerepo=’tyk_tyk-gateway’ –enablerepo=epel info zabbix</p>
+</li>
+</ul>
+<p>  yum install -y redis tyk-gateway</p>
+<p>  service redis start</p>
+<p>  /opt/tyk-gateway/install/setup.sh –listenport=8080 –redishost=localhost –redisport=6379 –domain=””</p>
+<p>  <a href="https://packagecloud.io/tyk/tyk-gateway" target="_blank" rel="noopener">https://packagecloud.io/tyk/tyk-gateway</a></p>
+<p>  /opt/tyk-dashboard/install/setup.sh –listenport=3000 –redishost=localhost –redisport=6379 –mongo=mongodb://127.0.0.1/tyk_analytics –tyk_api_hostname=$HOSTNAME –tyk_node_hostname=<a href="http://localhost" target="_blank" rel="noopener">http://localhost</a><br>  –tyk_node_port=8080 –portal_root=/portal –domain=”tyk.rootu.cn”</p>
+<p>  sudo service mongod start</p>
+<p>  service tyk-dashboard start</p>
+<p>  ./tyk-analytics –newuser –neworg</p>
+<p>用logrotate分割日志：</p>
+<p>在<code>logrotate.d</code> 中加入tky配置文件</p>
+<pre><code class="bash">/var/<span class="built_in">log</span>/tyk-gateway.stderr {
+    daily 
+    rotate 10
+    copytruncate
+    notifempty
+    missingok
+    create 664 root root
+}
+
+/var/<span class="built_in">log</span>/tyk-dashboard.stderr {
+    daily
+    rotate 10
+    copytruncate
+    notifempty
+    missingok
+    create 664 root root
+}
+
+</code></pre>
+<p><code>sudo logrotate -f /etc/logrotate.conf</code> 及时分割</p>
+<p>/usr/sbin/logrotate -d -f /etc/logrotate.d/tyk-gateway </p>
+<p>sudo systemctl enable tyk-gateway //加入开机启动项</p>
+<p>– 查看开机启动项所在位置 </p>
+<p>/etc/systemd/system/multi-user.target.wants</p>
+]]></content>
+      
+        <categories>
+            
+            <category> Gateway </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> TYK </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Autofac(二)]]></title>
       <url>http://ccccccmd.rootu.cn/2017/04/04/Autofac-%E4%BA%8C/</url>
       <content type="html"><![CDATA[<h2 id="在注册的过程中提供参数"><a href="#在注册的过程中提供参数" class="headerlink" title="在注册的过程中提供参数"></a>在注册的过程中提供参数</h2><p><a href="http://docs.autofac.org/en/latest/register/parameters.html" target="_blank" rel="noopener">doc</a></p>
@@ -1037,74 +1104,6 @@ port=0;
             
         </categories>
         
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[AWS 其他产品]]></title>
-      <url>http://ccccccmd.rootu.cn/2017/02/21/AWS-Others/</url>
-      <content type="html"><![CDATA[<h2 id="Elastic-Load-Balancing"><a href="#Elastic-Load-Balancing" class="headerlink" title="Elastic Load Balancing"></a>Elastic Load Balancing</h2><p><a href="http://docs.aws.amazon.com/zh_cn/elasticloadbalancing/latest/userguide/what-is-load-balancing.html" target="_blank" rel="noopener">简介</a></p>
-<p><a href="http://docs.aws.amazon.com/zh_cn/elasticloadbalancing/latest/userguide/load-balancer-getting-started.html" target="_blank" rel="noopener">入门</a></p>
-<h2 id="Amazon-SQS"><a href="#Amazon-SQS" class="headerlink" title="Amazon SQS"></a>Amazon SQS</h2><p><a href="https://aws.amazon.com/cn/sqs/details/" target="_blank" rel="noopener">简介</a></p>
-<ul>
-<li>标准队列</li>
-</ul>
-<p>标准队列使您能够每秒处理近乎无限数量的事务。标准队列可确保每条消息至少被传送一次。</p>
-<ul>
-<li>FIFO 队列</li>
-</ul>
-<p>这种队列类型最重要的功能是 FIFO (先进先出) 传送和一次性处理：让消息的发送顺序和接收顺序严格保持一致，且消息只传送一次并保留到用户将其处理和删除；重复的消息不会被引入队列。FIFO 队列还支持消息组，即允许在单个队列中传送多个有序流。FIFO 队列仅限 300 笔交易/秒 (TPS)，但具有标准队列的所有功能。</p>
-<ul>
-<li>特点</li>
-</ul>
-<p>消息可以在队列中最多保留 14 天。</p>
-<p>开发人员可以创建任意数量的 Amazon SQS 队列，队列可包含无限数量的消息。</p>
-<a id="more"></a>
-<ul>
-<li>价格</li>
-</ul>
-<p><a href="https://aws.amazon.com/cn/sqs/pricing/" target="_blank" rel="noopener">计费</a></p>
-<p>Amazon SQS 请求定价<br>    标准队列<br>    0.40 USD (每个请求 0.00000040 USD)<br>    FIFO 队列<br>    0.50 USD (每个请求 0.00000050 USD)</p>
-<p>Amazon SQS 数据传输定价</p>
-<ul>
-<li>开发</li>
-</ul>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AWSSimpleQueueService/latest/SQSDeveloperGuide/Welcome.html" target="_blank" rel="noopener">DOC</a></p>
-<p><a href="https://docs.aws.amazon.com/sdk-for-net/v3/developer-guide/sqs-apis-intro.html" target="_blank" rel="noopener">Code Examples</a></p>
-<h2 id="Amazon-CloudFront"><a href="#Amazon-CloudFront" class="headerlink" title="Amazon CloudFront"></a>Amazon CloudFront</h2><ul>
-<li>CDN</li>
-</ul>
-<h2 id="Amazon-ElastiCache-分布式缓存"><a href="#Amazon-ElastiCache-分布式缓存" class="headerlink" title="Amazon ElastiCache  分布式缓存"></a>Amazon ElastiCache  分布式缓存</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonElastiCache/latest/UserGuide/WhatIs.html" target="_blank" rel="noopener">文档</a></p>
-<h2 id="VPC"><a href="#VPC" class="headerlink" title="VPC"></a>VPC</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Introduction.html?shortFooter=true" target="_blank" rel="noopener">什么是VPC</a></p>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/GettingStartedGuide/ExerciseOverview.html" target="_blank" rel="noopener">vpc 文档</a></p>
-<ul>
-<li>它在逻辑上与 AWS 云中的其他虚拟网络隔绝。可在 VPC 中启动 AWS 资源</li>
-</ul>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Subnets.html?shortFooter=true#vpc-subnet-basics" target="_blank" rel="noopener">VPC和子网</a></p>
-<ul>
-<li>每个子网都必须关联一个路由表，这个路由表可指定允许出站流量离开子网的可用路由。您创建的每个子网都会自动关联 VPC 的主路由表。</li>
-</ul>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html?shortFooter=true#Add_IGW_Attach_Gateway" target="_blank" rel="noopener">Internet 网关</a></p>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Route_Tables.html?shortFooter=true" target="_blank" rel="noopener">路由表</a></p>
-<ul>
-<li>在您的 VPC 中的每个子网必须与一个路由表关联；路由表控制子网的路由。一个子网一次只能与一个路由表关联，但您可以将多个子网与同一路由表关联。</li>
-</ul>
-<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html?shortFooter=true" target="_blank" rel="noopener">安全组</a></p>
-<h2 id="Amazon-CloudWatch"><a href="#Amazon-CloudWatch" class="headerlink" title="Amazon CloudWatch"></a>Amazon CloudWatch</h2><p><a href="https://docs.amazonaws.cn/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html" target="_blank" rel="noopener">创建报警</a></p>
-]]></content>
-      
-        <categories>
-            
-            <category> AWS </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> RDS Others </tag>
-            
-        </tags>
         
     </entry>
     
@@ -1179,6 +1178,74 @@ port=0;
         <tags>
             
             <tag> RDS </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[AWS 其他产品]]></title>
+      <url>http://ccccccmd.rootu.cn/2017/02/21/AWS-Others/</url>
+      <content type="html"><![CDATA[<h2 id="Elastic-Load-Balancing"><a href="#Elastic-Load-Balancing" class="headerlink" title="Elastic Load Balancing"></a>Elastic Load Balancing</h2><p><a href="http://docs.aws.amazon.com/zh_cn/elasticloadbalancing/latest/userguide/what-is-load-balancing.html" target="_blank" rel="noopener">简介</a></p>
+<p><a href="http://docs.aws.amazon.com/zh_cn/elasticloadbalancing/latest/userguide/load-balancer-getting-started.html" target="_blank" rel="noopener">入门</a></p>
+<h2 id="Amazon-SQS"><a href="#Amazon-SQS" class="headerlink" title="Amazon SQS"></a>Amazon SQS</h2><p><a href="https://aws.amazon.com/cn/sqs/details/" target="_blank" rel="noopener">简介</a></p>
+<ul>
+<li>标准队列</li>
+</ul>
+<p>标准队列使您能够每秒处理近乎无限数量的事务。标准队列可确保每条消息至少被传送一次。</p>
+<ul>
+<li>FIFO 队列</li>
+</ul>
+<p>这种队列类型最重要的功能是 FIFO (先进先出) 传送和一次性处理：让消息的发送顺序和接收顺序严格保持一致，且消息只传送一次并保留到用户将其处理和删除；重复的消息不会被引入队列。FIFO 队列还支持消息组，即允许在单个队列中传送多个有序流。FIFO 队列仅限 300 笔交易/秒 (TPS)，但具有标准队列的所有功能。</p>
+<ul>
+<li>特点</li>
+</ul>
+<p>消息可以在队列中最多保留 14 天。</p>
+<p>开发人员可以创建任意数量的 Amazon SQS 队列，队列可包含无限数量的消息。</p>
+<a id="more"></a>
+<ul>
+<li>价格</li>
+</ul>
+<p><a href="https://aws.amazon.com/cn/sqs/pricing/" target="_blank" rel="noopener">计费</a></p>
+<p>Amazon SQS 请求定价<br>    标准队列<br>    0.40 USD (每个请求 0.00000040 USD)<br>    FIFO 队列<br>    0.50 USD (每个请求 0.00000050 USD)</p>
+<p>Amazon SQS 数据传输定价</p>
+<ul>
+<li>开发</li>
+</ul>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AWSSimpleQueueService/latest/SQSDeveloperGuide/Welcome.html" target="_blank" rel="noopener">DOC</a></p>
+<p><a href="https://docs.aws.amazon.com/sdk-for-net/v3/developer-guide/sqs-apis-intro.html" target="_blank" rel="noopener">Code Examples</a></p>
+<h2 id="Amazon-CloudFront"><a href="#Amazon-CloudFront" class="headerlink" title="Amazon CloudFront"></a>Amazon CloudFront</h2><ul>
+<li>CDN</li>
+</ul>
+<h2 id="Amazon-ElastiCache-分布式缓存"><a href="#Amazon-ElastiCache-分布式缓存" class="headerlink" title="Amazon ElastiCache  分布式缓存"></a>Amazon ElastiCache  分布式缓存</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonElastiCache/latest/UserGuide/WhatIs.html" target="_blank" rel="noopener">文档</a></p>
+<h2 id="VPC"><a href="#VPC" class="headerlink" title="VPC"></a>VPC</h2><p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Introduction.html?shortFooter=true" target="_blank" rel="noopener">什么是VPC</a></p>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/GettingStartedGuide/ExerciseOverview.html" target="_blank" rel="noopener">vpc 文档</a></p>
+<ul>
+<li>它在逻辑上与 AWS 云中的其他虚拟网络隔绝。可在 VPC 中启动 AWS 资源</li>
+</ul>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Subnets.html?shortFooter=true#vpc-subnet-basics" target="_blank" rel="noopener">VPC和子网</a></p>
+<ul>
+<li>每个子网都必须关联一个路由表，这个路由表可指定允许出站流量离开子网的可用路由。您创建的每个子网都会自动关联 VPC 的主路由表。</li>
+</ul>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html?shortFooter=true#Add_IGW_Attach_Gateway" target="_blank" rel="noopener">Internet 网关</a></p>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_Route_Tables.html?shortFooter=true" target="_blank" rel="noopener">路由表</a></p>
+<ul>
+<li>在您的 VPC 中的每个子网必须与一个路由表关联；路由表控制子网的路由。一个子网一次只能与一个路由表关联，但您可以将多个子网与同一路由表关联。</li>
+</ul>
+<p><a href="http://docs.aws.amazon.com/zh_cn/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html?shortFooter=true" target="_blank" rel="noopener">安全组</a></p>
+<h2 id="Amazon-CloudWatch"><a href="#Amazon-CloudWatch" class="headerlink" title="Amazon CloudWatch"></a>Amazon CloudWatch</h2><p><a href="https://docs.amazonaws.cn/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html" target="_blank" rel="noopener">创建报警</a></p>
+]]></content>
+      
+        <categories>
+            
+            <category> AWS </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> RDS Others </tag>
             
         </tags>
         
@@ -1483,6 +1550,71 @@ port=0;
     </entry>
     
     <entry>
+      <title><![CDATA[ABP and Angular]]></title>
+      <url>http://ccccccmd.rootu.cn/2017/01/12/abp-angular/</url>
+      <content type="html"><![CDATA[<ul>
+<li><p>下载 abp angular 项目模板<br>先装yarn<br>然后yarn install<br>npm start<br>ng serve</p>
+</li>
+<li><p>菜单配置 在layout/sidebar-nav.component.ts</p>
+</li>
+<li><p>然后在客户端运行nswag / refresh.bat文件以重新生成服务代理类（它们用于调用服务器端服务方法）。</p>
+</li>
+<li><p>service-proxy.module.ts  添加   ApiServiceProxies.LotteryServiceProxy</p>
+</li>
+</ul>
+<p>更换语言</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app.module.ts</span><br><span class="line">import localeZhHans from <span class="string">'@angular/common/locales/zh-Hans'</span>;</span><br><span class="line">import &#123; registerLocaleData &#125; from <span class="string">'@angular/common'</span>;</span><br><span class="line">registerLocaleData(localeZhHans);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>组件，指定都用要用angular-cli生成，需要注意修改：</li>
+</ul>
+<p>子组件的selector</p>
+<p>form 的id</p>
+<ul>
+<li>代码生成器生成的字段_id要去掉</li>
+</ul>
+<p>指令写法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import &#123; Directive, Input, ElementRef, OnInit &#125; from <span class="string">'@angular/core'</span>;</span><br><span class="line">import moment from <span class="string">'moment'</span>;</span><br><span class="line"></span><br><span class="line">@Directive(&#123;</span><br><span class="line">    selector: <span class="string">'[cnode-from-now]'</span> // Attribute selector</span><br><span class="line">&#125;)</span><br><span class="line"><span class="built_in">export</span> class CnodeFromNowDirective implements OnInit &#123;</span><br><span class="line"></span><br><span class="line">    @Input(<span class="string">'cnode-from-now'</span>) dateTime: Date;</span><br><span class="line">    constructor(private ele: ElementRef) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    ngOnInit(): void &#123;</span><br><span class="line">        (&lt;HTMLElement&gt;this.ele.nativeElement).innerText = moment(this.dateTime).locale(<span class="string">'zh-cn'</span>).fromNow();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      
+        <categories>
+            
+            <category> ABP </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> ABP </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[identityserver]]></title>
+      <url>http://ccccccmd.rootu.cn/2017/01/12/identityserver/</url>
+      <content type="html"><![CDATA[<p>center identityserver</p>
+<p>api IdentityServer4.AccessTokenValidation</p>
+<p>client identity.model</p>
+]]></content>
+      
+        <categories>
+            
+            <category> C# </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> C# </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Docker]]></title>
       <url>http://ccccccmd.rootu.cn/2017/01/12/docker/</url>
       <content type="html"><![CDATA[<h2 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h2><ul>
@@ -1551,71 +1683,6 @@ port=0;
         <tags>
             
             <tag> Docker </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[ABP and Angular]]></title>
-      <url>http://ccccccmd.rootu.cn/2017/01/12/abp-angular/</url>
-      <content type="html"><![CDATA[<ul>
-<li><p>下载 abp angular 项目模板<br>先装yarn<br>然后yarn install<br>npm start<br>ng serve</p>
-</li>
-<li><p>菜单配置 在layout/sidebar-nav.component.ts</p>
-</li>
-<li><p>然后在客户端运行nswag / refresh.bat文件以重新生成服务代理类（它们用于调用服务器端服务方法）。</p>
-</li>
-<li><p>service-proxy.module.ts  添加   ApiServiceProxies.LotteryServiceProxy</p>
-</li>
-</ul>
-<p>更换语言</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app.module.ts</span><br><span class="line">import localeZhHans from <span class="string">'@angular/common/locales/zh-Hans'</span>;</span><br><span class="line">import &#123; registerLocaleData &#125; from <span class="string">'@angular/common'</span>;</span><br><span class="line">registerLocaleData(localeZhHans);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>组件，指定都用要用angular-cli生成，需要注意修改：</li>
-</ul>
-<p>子组件的selector</p>
-<p>form 的id</p>
-<ul>
-<li>代码生成器生成的字段_id要去掉</li>
-</ul>
-<p>指令写法：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import &#123; Directive, Input, ElementRef, OnInit &#125; from <span class="string">'@angular/core'</span>;</span><br><span class="line">import moment from <span class="string">'moment'</span>;</span><br><span class="line"></span><br><span class="line">@Directive(&#123;</span><br><span class="line">    selector: <span class="string">'[cnode-from-now]'</span> // Attribute selector</span><br><span class="line">&#125;)</span><br><span class="line"><span class="built_in">export</span> class CnodeFromNowDirective implements OnInit &#123;</span><br><span class="line"></span><br><span class="line">    @Input(<span class="string">'cnode-from-now'</span>) dateTime: Date;</span><br><span class="line">    constructor(private ele: ElementRef) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    ngOnInit(): void &#123;</span><br><span class="line">        (&lt;HTMLElement&gt;this.ele.nativeElement).innerText = moment(this.dateTime).locale(<span class="string">'zh-cn'</span>).fromNow();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-      
-        <categories>
-            
-            <category> ABP </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> ABP </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[identityserver]]></title>
-      <url>http://ccccccmd.rootu.cn/2017/01/12/identityserver/</url>
-      <content type="html"><![CDATA[<p>center identityserver</p>
-<p>api IdentityServer4.AccessTokenValidation</p>
-<p>client identity.model</p>
-]]></content>
-      
-        <categories>
-            
-            <category> C# </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> C# </tag>
             
         </tags>
         
